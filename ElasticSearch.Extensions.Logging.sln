@@ -5,7 +5,11 @@ VisualStudioVersion = 15.0.27428.2011
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearch.Extensions.Logging", "src\ElasticSearch.Extensions.Logging\ElasticSearch.Extensions.Logging.csproj", "{4FE1544C-93B8-4BA4-AA77-0B7A902DA2FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "example\SampleApp\SampleApp.csproj", "{34E5DAE8-4E57-4359-BCD2-8B0ADD00B833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApp", "example\SampleApp\SampleApp.csproj", "{34E5DAE8-4E57-4359-BCD2-8B0ADD00B833}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{68247023-A902-41D2-9500-42D40551A179}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLogger.Test", "src\ElasticLogger.Test\ElasticLogger.Test.csproj", "{DD0BE474-8C02-44FF-9FFD-FC684CB17C40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,16 @@ Global
 		{34E5DAE8-4E57-4359-BCD2-8B0ADD00B833}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34E5DAE8-4E57-4359-BCD2-8B0ADD00B833}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34E5DAE8-4E57-4359-BCD2-8B0ADD00B833}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD0BE474-8C02-44FF-9FFD-FC684CB17C40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD0BE474-8C02-44FF-9FFD-FC684CB17C40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD0BE474-8C02-44FF-9FFD-FC684CB17C40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD0BE474-8C02-44FF-9FFD-FC684CB17C40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DD0BE474-8C02-44FF-9FFD-FC684CB17C40} = {68247023-A902-41D2-9500-42D40551A179}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A43E2A0D-C329-4959-A806-ACFFC9DACDB5}
