@@ -157,7 +157,7 @@ namespace ElasticSearch.Extensions.Logging
             }
 
             var message = formatter(state, exception);
-
+            
             WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
 
         }
