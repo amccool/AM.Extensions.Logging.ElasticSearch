@@ -10,5 +10,15 @@ namespace ElasticLogger.Test
         {
 
         }
+
+        [Fact]
+        public void Test2()
+        {
+            bool on = true;
+
+            Assert.True(on);
+
+        }
+
     }
 }
