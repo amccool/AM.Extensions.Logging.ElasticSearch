@@ -15,7 +15,7 @@ namespace ElasticSearch.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggerFactory AddElasticSearch(this ILoggerFactory factory, Uri endpoint)
         {
-            return AddElasticSearch(factory, endpoint, (n, l) => l >= LogLevel.Information, "trace");
+            return AddElasticSearch(factory, endpoint, (n, l) => l >= LogLevel.Trace, "trace");
         }
         public static ILoggerFactory AddElasticSearch(this ILoggerFactory factory, Uri endpoint, LogLevel minLevel)
         {

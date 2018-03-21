@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
@@ -13,6 +14,9 @@ using Newtonsoft.Json.Linq;
 
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using Newtonsoft.Json;
 
 namespace ElasticSearch.Extensions.Logging
 {
@@ -152,14 +156,98 @@ namespace ElasticSearch.Extensions.Logging
                 return;
             }
 
-            //
+            var message = formatter(state, exception);
+
+            WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
 
         }
 
 
 
 
+        protected void WriteTrace(
+            //TraceEventCache eventCache,
+            string loggerName,
+            LogLevel eventType,
+            int id,
+            string message,
+            Guid? relatedActivityId,
+            object data)
+        {
 
+            //if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
+            //{
+            //    return;
+            //}
+
+            string updatedMessage = message;
+            JObject payload = null;
+            if (data != null)
+            {
+                if (data is Exception)
+                {
+                    updatedMessage = ((Exception)data).Message;
+                    payload = JObject.FromObject(data);
+                }
+                else if (data is XPathNavigator)
+                {
+                    var xdata = data as XPathNavigator;
+                    //xdata.MoveToRoot();
+
+                    XDocument xmlDoc;
+                    try
+                    {
+                        xmlDoc = XDocument.Parse(xdata.OuterXml);
+
+                    }
+                    catch (Exception)
+                    {
+                        xmlDoc = XDocument.Parse(xdata.ToString());
+                        //eat
+                        //throw;
+                    }
+
+                    // Convert the XML document in to a dynamic C# object.
+                    dynamic xmlContent = new ExpandoObject();
+                    ExpandoObjectHelper.Parse(xmlContent, xmlDoc.Root);
+
+                    string json = JsonConvert.SerializeObject(xmlContent);
+                    payload = JObject.Parse(json);
+                }
+                else if (data is DateTime)
+                {
+                    payload = new JObject();
+                    payload.Add("System.DateTime", (DateTime)data);
+                }
+                else if (data is string)
+                {
+                    payload = new JObject();
+                    payload.Add("string", (string)data);
+                }
+                else if (data.GetType().IsValueType)
+                {
+                    payload = new JObject { { "data", data.ToString() } };
+                }
+                else
+                {
+                    try
+                    {
+                        payload = JObject.FromObject(data);
+                    }
+                    catch (JsonSerializationException jEx)
+                    {
+                        payload = new JObject();
+                        payload.Add("FAILURE", jEx.Message);
+                        payload.Add("data", data.GetType().ToString());
+                    }
+                }
+            }
+
+            //Debug.Assert(!string.IsNullOrEmpty(updatedMessage));
+            //Debug.Assert(payload != null);
+
+            InternalWrite(new TraceEventCache(), loggerName, eventType, id, updatedMessage, relatedActivityId, payload);
+        }
 
 
 
@@ -167,8 +255,8 @@ namespace ElasticSearch.Extensions.Logging
 
         private void InternalWrite(
                     TraceEventCache eventCache,
-                    string source,
-                    TraceEventType eventType,
+                    string loggerName,
+                    LogLevel eventType,
                     int? traceId,
                     string message,
                     Guid?
@@ -206,13 +294,9 @@ namespace ElasticSearch.Extensions.Logging
             string threadId = eventCache != null ? eventCache.ThreadId : string.Empty;
             string thread = Thread.CurrentThread.Name ?? threadId;
 
-
-
-
             IPrincipal principal = Thread.CurrentPrincipal;
             IIdentity identity = principal?.Identity;
             string identityname = identity == null ? string.Empty : identity.Name;
-
 
             string username = $"{_userDomainName}\\{_userName}";
 
@@ -220,7 +304,7 @@ namespace ElasticSearch.Extensions.Logging
             {
                 var jo = new JObject
                     {
-                        {"Source", source },
+                        {"LoggerName", loggerName },
                         {"TraceId", traceId ?? 0},
                         {"EventType", eventType.ToString()},
                         {"UtcDateTime", logTime},
