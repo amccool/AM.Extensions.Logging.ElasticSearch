@@ -2,7 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>ElasticSearch.Extensions.Logging</PackageId>
+    <Version>1.0.3</Version>
+    <PackageVersion>1.0.3</PackageVersion>
+    <PackageVersionPrefix>x</PackageVersionPrefix>
+    <PackageVersionSuffix>x</PackageVersionSuffix>
+    <Authors>amccool</Authors>
+    <Product>ElasticSearch.Extensions.Loggingx</Product>
+    <Description>Microsoft.Extensions.Logging piping to ElasticSearch</Description>
+    <Copyright>2018</Copyright>
+    <PackageTags>ElasticSearch</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
