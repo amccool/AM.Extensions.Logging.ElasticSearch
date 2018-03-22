@@ -39,8 +39,8 @@ namespace SampleApp
                 .AddSingleton(new LoggerFactory()
                     .AddConsole(LogLevel.Trace)
                     .AddDebug()
-                    .AddElasticSearch(new Uri(@"http://smellycat01.devint.dev-r5ead.net:9200/"), 
-                        LogLevel.Warning)
+                    .AddElasticSearch(new Uri(@"http://localhost:9200/"), 
+                        LogLevel.Trace)
                 )
                 .AddSingleton<IApp, App>();
             

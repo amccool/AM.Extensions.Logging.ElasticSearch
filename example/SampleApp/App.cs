@@ -34,7 +34,10 @@ namespace SampleApp
             //    await _backupService.Run(source);
             //}
 
-            breakstuff();
+            for (int i = 0; i < 1000; i++)
+            {
+                breakstuff();
+            }
 
             _logger.LogInformation("Ending Service for  with LogKey {logKey}");
         }
