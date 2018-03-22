@@ -22,6 +22,8 @@ namespace ElasticSearch.Extensions.Logging
 {
     public class ElasticSearchLogger : ILogger
     {
+        private const string DocumentType = "doc";
+
         private IElasticLowLevelClient _client;
         private readonly Uri _endpoint;
         private readonly string _indexPrefix;
@@ -336,7 +338,7 @@ namespace ElasticSearch.Extensions.Logging
         {
             try
             {
-                await Client.IndexAsync<VoidResponse>(Index, "_doc", jo.ToString());
+                await Client.IndexAsync<VoidResponse>(Index, DocumentType, jo.ToString());
             }
             catch (Exception ex)
             {
@@ -349,7 +351,7 @@ namespace ElasticSearch.Extensions.Logging
             if (!jos.Any())
                 return;
 
-            var indx = new { index = new { _index = Index, _type = "_doc" } };
+            var indx = new { index = new { _index = Index, _type = DocumentType } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
 
             var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
@@ -357,7 +359,7 @@ namespace ElasticSearch.Extensions.Logging
 
             try
             {
-                await Client.BulkPutAsync<VoidResponse>(Index, "_doc", bbo.ToArray(), br => br.Refresh(false));
+                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
             }
             catch (Exception ex)
             {
