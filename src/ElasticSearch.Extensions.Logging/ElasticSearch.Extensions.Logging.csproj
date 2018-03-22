@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>ElasticSearch.Extensions.Logging</PackageId>
+    <PackageId>AM.ElasticSearch.Extensions.Logging</PackageId>
     <Version>1.0.3</Version>
     <PackageVersion>1.0.3</PackageVersion>
     <PackageVersionPrefix>x</PackageVersionPrefix>
