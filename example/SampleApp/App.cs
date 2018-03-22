@@ -36,13 +36,13 @@ namespace SampleApp
 
             for (int i = 0; i < 1000; i++)
             {
-                breakstuff();
+                Breakstuff();
             }
 
             _logger.LogInformation("Ending Service for  with LogKey {logKey}");
         }
 
-        private void breakstuff()
+        private void Breakstuff()
         {
             int x = 0;
             try

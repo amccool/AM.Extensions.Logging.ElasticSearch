@@ -159,7 +159,6 @@ namespace ElasticSearch.Extensions.Logging
             var message = formatter(state, exception);
             
             WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
-
         }
 
 
@@ -304,7 +303,7 @@ namespace ElasticSearch.Extensions.Logging
             {
                 var jo = new JObject
                     {
-                        {"LoggerName", loggerName },
+                        {"Source", loggerName },
                         {"TraceId", traceId ?? 0},
                         {"EventType", eventType.ToString()},
                         {"UtcDateTime", logTime},
@@ -337,7 +336,7 @@ namespace ElasticSearch.Extensions.Logging
         {
             try
             {
-                await Client.IndexAsync<VoidResponse>(Index, "Trace", jo.ToString());
+                await Client.IndexAsync<VoidResponse>(Index, "_doc", jo.ToString());
             }
             catch (Exception ex)
             {
@@ -350,7 +349,7 @@ namespace ElasticSearch.Extensions.Logging
             if (!jos.Any())
                 return;
 
-            var indx = new { index = new { _index = Index, _type = "Trace" } };
+            var indx = new { index = new { _index = Index, _type = "_doc" } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
 
             var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
@@ -358,7 +357,7 @@ namespace ElasticSearch.Extensions.Logging
 
             try
             {
-                await Client.BulkPutAsync<VoidResponse>(Index, "Trace", bbo.ToArray(), br => br.Refresh(false));
+                await Client.BulkPutAsync<VoidResponse>(Index, "_doc", bbo.ToArray(), br => br.Refresh(false));
             }
             catch (Exception ex)
             {
