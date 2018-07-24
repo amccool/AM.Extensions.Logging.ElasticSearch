@@ -31,7 +31,7 @@ namespace ElasticLogger.Test
                 circularRefObj.me = circularRefObj;
 
 
-                logger.Log(LogLevel.Critical, new EventId(), circularRefObj, null, null);
+                logger.Log(LogLevel.Critical, new EventId(), circularRefObj, null, (circle, exception) => "");
 
             }
 
