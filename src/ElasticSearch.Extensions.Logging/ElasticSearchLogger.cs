@@ -183,12 +183,15 @@ namespace ElasticSearch.Extensions.Logging
 
             string updatedMessage = message;
             JObject payload = null;
+            var serializerIgnoreReferenceLoop = new JsonSerializer { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
             if (data != null)
             {
                 if (data is Exception)
                 {
                     updatedMessage = ((Exception)data).Message;
-                    payload = JObject.FromObject(data);
+
+                    
+                    payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
                 }
                 else if (data is XPathNavigator)
                 {
@@ -212,7 +215,7 @@ namespace ElasticSearch.Extensions.Logging
                     dynamic xmlContent = new ExpandoObject();
                     ExpandoObjectHelper.Parse(xmlContent, xmlDoc.Root);
 
-                    string json = JsonConvert.SerializeObject(xmlContent);
+                    string json = JsonConvert.SerializeObject(xmlContent, new JsonSerializerSettings{ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
                     payload = JObject.Parse(json);
                 }
                 else if (data is DateTime)
@@ -233,7 +236,7 @@ namespace ElasticSearch.Extensions.Logging
                 {
                     try
                     {
-                        payload = JObject.FromObject(data);
+                        payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
                     }
                     catch (JsonSerializationException jEx)
                     {
