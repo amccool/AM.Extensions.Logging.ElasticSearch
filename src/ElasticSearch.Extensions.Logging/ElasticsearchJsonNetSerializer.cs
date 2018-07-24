@@ -37,6 +37,7 @@ namespace ElasticSearch.Extensions.Logging
             {
                 DefaultValueHandling = DefaultValueHandling.Include,
                 NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
             return settings;
         }
