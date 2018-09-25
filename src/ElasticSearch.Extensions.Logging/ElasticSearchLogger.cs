@@ -1,22 +1,21 @@
-﻿using System;
+﻿using Elasticsearch.Net;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Newtonsoft.Json;
 
 namespace ElasticSearch.Extensions.Logging
 {
@@ -80,8 +79,7 @@ namespace ElasticSearch.Extensions.Logging
                 {
                     var singleNode = new SingleNodeConnectionPool(_endpoint);
 
-                    var cc = new ConnectionConfiguration(singleNode,
-                            connectionSettings => new ElasticsearchJsonNetSerializer())
+                    var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
                         .EnableHttpPipelining()
                         .ThrowExceptions();
 
@@ -138,9 +136,9 @@ namespace ElasticSearch.Extensions.Logging
             return Filter(Name, logLevel);
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, 
-            TState state, 
-            Exception exception, 
+        public void Log<TState>(LogLevel logLevel, EventId eventId,
+            TState state,
+            Exception exception,
             Func<TState, Exception, string> formatter)
         {
             if (!IsEnabled(logLevel))
@@ -159,7 +157,7 @@ namespace ElasticSearch.Extensions.Logging
             }
 
             var message = formatter(state, exception);
-            
+
             WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
         }
 
@@ -190,7 +188,7 @@ namespace ElasticSearch.Extensions.Logging
                 {
                     updatedMessage = ((Exception)data).Message;
 
-                    
+
                     payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
                 }
                 else if (data is XPathNavigator)
@@ -362,7 +360,7 @@ namespace ElasticSearch.Extensions.Logging
 
             try
             {
-                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
+                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, PostData.MultiJson(bbo.ToArray()), new BulkRequestParameters { Refresh = Refresh.False });
             }
             catch (Exception ex)
             {
