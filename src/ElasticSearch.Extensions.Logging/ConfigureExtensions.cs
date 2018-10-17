@@ -12,7 +12,7 @@ namespace ElasticSearch.Extensions.Logging
         /// Enable ElasticSearch as logging provider in .NET Core.
         /// </summary>
         /// <param name="factory"></param>
-        /// <param name="endpoint">ES port 9200 endpoint</param>
+        /// <param name="endpoint">uri with ES port 9200 endpoint</param>
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggerFactory AddElasticSearch(this ILoggerFactory factory, Uri endpoint)
         {
@@ -34,7 +34,7 @@ namespace ElasticSearch.Extensions.Logging
 
 
         /// <summary>
-        /// Adds a console logger named 'Console' to the factory.
+        /// Adds a ElasticSearch logger named 'ElasticSearch' to the factory.
         /// </summary>
         /// <param name="builder">The <see cref="ILoggingBuilder"/> to use.</param>
         /// <param name="endpoint">elasticsearch uri for the cluster at port 9200</param>
@@ -45,7 +45,7 @@ namespace ElasticSearch.Extensions.Logging
 
 
         /// <summary>
-        /// Adds a console logger named 'Console' to the factory.
+        /// Adds a ElasticSearch logger named 'ElasticSearch' to the factory.
         /// </summary>
         /// <param name="builder">The <see cref="ILoggingBuilder"/> to use.</param>
         /// <param name="endpoint">elasticsearch uri for the cluster at port 9200</param>
