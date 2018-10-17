@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,11 +10,13 @@ namespace Elasticsearch.Extensions.Logging
     [ProviderAlias("Elasticsearch")]
     public class ElasticsearchLoggerProvider : ILoggerProvider
     {
+
         #region fields
         //private readonly Func<string, LogLevel, bool> _filter;
-
         private readonly string _indexPrefix;
         private readonly Uri _endpoint;
+        private readonly IOptions<LoggerFilterOptions> _filterOptions;
+
         #endregion
 
         //public ElasticsearchLoggerProvider(Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
@@ -22,8 +25,9 @@ namespace Elasticsearch.Extensions.Logging
         //    this._filter = filter;
         //    this._indexPrefix = indexPrefix;
         //}
-        public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> options)
+        public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> options, IOptions<LoggerFilterOptions> filterOptions)
         {
+            _filterOptions = filterOptions;
             //// Filter would be applied on LoggerFactory level
             //_filter = trueFilter;
             //_optionsReloadToken = options.OnChange(ReloadLoggerOptions);
@@ -35,7 +39,17 @@ namespace Elasticsearch.Extensions.Logging
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new ElasticSearchLogger(categoryName, _endpoint, _indexPrefix);
+            var logLevel = GetLogLevelForCategoryName(categoryName);
+
+            return new ElasticSearchLogger(categoryName, _endpoint, _indexPrefix, logLevel);
+        }
+
+        private LogLevel GetLogLevelForCategoryName(string categoryName)
+        {
+            var logLevel = _filterOptions.Value.Rules
+                                                    .FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+
+            return logLevel?.LogLevel ?? _filterOptions.Value.MinLevel;
         }
 
         #region IDisposable Support
