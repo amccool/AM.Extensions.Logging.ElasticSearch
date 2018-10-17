@@ -1,21 +1,21 @@
 ﻿{
   "Logging": {
     "LogLevel": {
-      "Default": ""
+      "Default": "Critical"
     },
-    "ElasticSearch": {
+    "Elasticsearch": {
       "IncludeScopes": "true",
       "LogLevel": {
-        "Default": "Critical",
-        "System": "Critical",
-        "Microsoft": "Critical",
-        "SampleApp.Program": "Critical",
-        "SampleApp.App": "Critical"
+        "Default": "Error",
+        "System": "Error",
+        "Microsoft": "Error",
+        "SampleApp.Program": "Error",
+        "SampleApp.App": "Error"
 
       }
     },
     "Console": {
-      "IncludeScopes": "true",
+      "IncludeScopes": "true", "DisableColors" :  "true", 
       "LogLevel": {
         "Default": "Trace",
         "System": "Trace",

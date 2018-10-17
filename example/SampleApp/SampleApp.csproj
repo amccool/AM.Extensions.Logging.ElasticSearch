@@ -29,11 +29,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.EventSource" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.TraceSource" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ElasticSearch.Extensions.Logging\ElasticSearch.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\src\ElasticSearch.Extensions.Logging\Elasticsearch.Extensions.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,11 +28,20 @@ namespace SampleApp
                 {
                     builder
                         .AddConfiguration(loggingConfiguration.GetSection("Logging"))
-                        .AddFilter("Microsoft", LogLevel.Warning)
-                        .AddFilter("System", LogLevel.Warning)
-                        .AddFilter("SampleApp.Program", LogLevel.Debug)
-                        .AddConsole()
-                        .AddElasticSearch(new Uri(@"http://localhost:9200/"));
+                        //.AddFilter("Microsoft", LogLevel.Warning)
+                        //.AddFilter("System", LogLevel.Warning)
+                        //.AddFilter("SampleApp.Program", LogLevel.Debug)
+                        .AddConsole(options =>
+                        {
+                            options.DisableColors = true;
+                            options.IncludeScopes = true;
+                        })
+                        .AddEventSourceLogger()
+                        .AddElasticSearch(options =>
+                        {
+                            options.ElasticsearchEndpoint = new Uri(@"http://localhost:9200/");
+                            options.IndexName = "trace";
+                        });
                 });
 
             // providers may be added to a LoggerFactory before any loggers are created
