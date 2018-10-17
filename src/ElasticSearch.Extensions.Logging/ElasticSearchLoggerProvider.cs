@@ -47,7 +47,8 @@ namespace Elasticsearch.Extensions.Logging
         private LogLevel GetLogLevelForCategoryName(string categoryName)
         {
             var logLevel = _filterOptions.Value.Rules
-                                                    .FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+                                                .Where(x => x.ProviderName.Equals("Elasticsearch"))
+                                                .FirstOrDefault(x => x.CategoryName.Equals(categoryName));
 
             return logLevel?.LogLevel ?? _filterOptions.Value.MinLevel;
         }

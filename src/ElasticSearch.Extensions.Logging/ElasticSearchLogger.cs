@@ -121,7 +121,7 @@ namespace Elasticsearch.Extensions.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _logLevel == logLevel;
+            return _logLevel <= logLevel;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, 
