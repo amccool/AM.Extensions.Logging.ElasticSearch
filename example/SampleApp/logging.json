@@ -1,12 +1,28 @@
 ﻿{
   "Logging": {
     "LogLevel": {
-      "Default": "Debug",
-      "System": "Information",
-      "Microsoft": "Information"
+      "Default": "Critical"
     },
-    "ElasticSearch": {
-      "IncludeScopes": "true"
+    "Elasticsearch": {
+      "IncludeScopes": "true",
+      "LogLevel": {
+        "Default": "Error",
+        "System": "Error",
+        "Microsoft": "Error",
+        "SampleApp.Program": "Error",
+        "SampleApp.App": "Error"
+
+      }
+    },
+    "Console": {
+      "IncludeScopes": "true", "DisableColors" :  "true", 
+      "LogLevel": {
+        "Default": "Trace",
+        "System": "Trace",
+        "Microsoft": "Trace",
+        "SampleApp.Program": "Trace",
+        "SampleApp.App": "Trace"
+      }
     }
   }
 }

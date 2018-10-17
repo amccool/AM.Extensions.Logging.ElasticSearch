@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Newtonsoft.Json;
 
-namespace ElasticSearch.Extensions.Logging
+namespace Elasticsearch.Extensions.Logging
 {
     public class ElasticsearchJsonNetSerializer : IElasticsearchSerializer
     {

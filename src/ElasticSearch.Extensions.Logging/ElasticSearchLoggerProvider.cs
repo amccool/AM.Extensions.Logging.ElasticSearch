@@ -2,28 +2,40 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace ElasticSearch.Extensions.Logging
+namespace Elasticsearch.Extensions.Logging
 {
-    public class ElasticSearchLoggerProvider : ILoggerProvider
+    [ProviderAlias("Elasticsearch")]
+    public class ElasticsearchLoggerProvider : ILoggerProvider
     {
         #region fields
-        private readonly Func<string, LogLevel, bool> _filter;
+        //private readonly Func<string, LogLevel, bool> _filter;
 
         private readonly string _indexPrefix;
         private readonly Uri _endpoint;
         #endregion
 
-        public ElasticSearchLoggerProvider(Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
+        //public ElasticsearchLoggerProvider(Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
+        //{
+        //    this._endpoint = endpoint;
+        //    this._filter = filter;
+        //    this._indexPrefix = indexPrefix;
+        //}
+        public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> options)
         {
-            this._endpoint = endpoint;
-            this._filter = filter;
-            this._indexPrefix = indexPrefix;
+            //// Filter would be applied on LoggerFactory level
+            //_filter = trueFilter;
+            //_optionsReloadToken = options.OnChange(ReloadLoggerOptions);
+            //ReloadLoggerOptions(options.CurrentValue);
+
+            _indexPrefix = options.CurrentValue.IndexName;
+            _endpoint = options.CurrentValue.ElasticsearchEndpoint;
         }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new ElasticSearchLogger(categoryName, _endpoint, _filter, _indexPrefix);
+            return new ElasticSearchLogger(categoryName, _endpoint, _indexPrefix);
         }
 
         #region IDisposable Support

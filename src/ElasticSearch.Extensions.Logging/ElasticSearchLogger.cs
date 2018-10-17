@@ -18,7 +18,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
 
-namespace ElasticSearch.Extensions.Logging
+namespace Elasticsearch.Extensions.Logging
 {
     public class ElasticSearchLogger : ILogger
     {
@@ -32,7 +32,7 @@ namespace ElasticSearch.Extensions.Logging
         private readonly string _userName;
         private readonly string _machineName;
 
-        public ElasticSearchLogger(string name, Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
+        public ElasticSearchLogger(string name, Uri endpoint, string indexPrefix)
         {
             Name = name;
             Filter = filter ?? ((category, logLevel) => true);

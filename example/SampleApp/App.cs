@@ -26,6 +26,13 @@ namespace SampleApp
 
         public async Task Run()
         {
+            _logger.LogCritical("Run...................");
+            _logger.LogDebug("Run...................");
+            _logger.LogError("Run...................");
+            _logger.LogInformation("Run...................");
+            _logger.LogTrace("Run...................");
+            _logger.LogWarning("Run...................");
+
             string logKey = Guid.NewGuid().ToString();
 
             //// Push ID to log
@@ -34,7 +41,7 @@ namespace SampleApp
             //    await _backupService.Run(source);
             //}
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Breakstuff();
             }
