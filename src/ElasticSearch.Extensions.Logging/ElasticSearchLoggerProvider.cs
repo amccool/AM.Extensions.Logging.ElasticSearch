@@ -39,11 +39,22 @@ namespace Elasticsearch.Extensions.Logging
 
         private LogLevel GetLogLevelForCategoryName(string categoryName)
         {
-            var logLevel = _filterOptions.Value.Rules
-                                                .Where(x => x.ProviderName.Equals("Elasticsearch"))
-                                                .FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+            if (_filterOptions == null || _filterOptions.Value == null || _filterOptions.Value.Rules == null)
+                return LogLevel.Warning;
 
-            return logLevel?.LogLevel ?? _filterOptions.Value.MinLevel;
+            var providerSpecific = _filterOptions.Value.Rules
+                .Where(x=>!string.IsNullOrEmpty(x.ProviderName))
+                .Where(x => x.ProviderName.Equals("Elasticsearch"))
+                .Where(x =>!string.IsNullOrEmpty(x.CategoryName));
+            if (providerSpecific.Any())
+            {
+                var matched = providerSpecific.FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+                return matched?.LogLevel ?? _filterOptions.Value.MinLevel;
+            }
+            else
+            {
+                return _filterOptions.Value.MinLevel;
+            }
         }
 
         #region IDisposable Support
