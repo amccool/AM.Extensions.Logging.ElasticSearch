@@ -18,27 +18,28 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
 
-namespace ElasticSearch.Extensions.Logging
+namespace Elasticsearch.Extensions.Logging
 {
-    public class ElasticSearchLogger : ILogger
+    public class ElasticsearchLogger : ILogger
     {
         private const string DocumentType = "doc";
 
         private IElasticLowLevelClient _client;
         private readonly Uri _endpoint;
         private readonly string _indexPrefix;
+        private readonly LogLevel _logLevel;
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
         private readonly string _userDomainName;
         private readonly string _userName;
         private readonly string _machineName;
-
-        public ElasticSearchLogger(string name, Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
+        
+        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix, LogLevel logLevel)
         {
             Name = name;
-            Filter = filter ?? ((category, logLevel) => true);
-
+            
             _endpoint = endpoint;
             _indexPrefix = indexPrefix;
+            _logLevel = logLevel;
 
             _userDomainName = Environment.UserDomainName;
             _userName = Environment.UserName;
@@ -52,22 +53,7 @@ namespace ElasticSearch.Extensions.Logging
         private string Index => this._indexPrefix.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
 
         public string Name { get; }
-
-        public Func<string, LogLevel, bool> Filter
-        {
-            get { return _filter; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                _filter = value;
-            }
-        }
-
-
+        
         public IElasticLowLevelClient Client
         {
             get
@@ -103,7 +89,7 @@ namespace ElasticSearch.Extensions.Logging
         }
 
         private Action<JObject> _scribeProcessor;
-        private Func<string, LogLevel, bool> _filter;
+        private List<Func<string, string, LogLevel, bool>> _filter;
 
         private void SetupObserver()
         {
@@ -135,7 +121,7 @@ namespace ElasticSearch.Extensions.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return Filter(Name, logLevel);
+            return _logLevel <= logLevel;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, 
