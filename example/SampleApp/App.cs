@@ -41,15 +41,21 @@ namespace SampleApp
             //    await _backupService.Run(source);
             //}
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 5000; i++)
             {
-                Breakstuff();
+                await Breakstuff();
+                _logger.LogCritical("Run...................");
+                _logger.LogDebug("Run...................");
+                _logger.LogError("Run...................");
+                _logger.LogInformation("Run...................");
+                _logger.LogTrace("Run...................");
+                _logger.LogWarning("Run...................");
             }
 
-            _logger.LogInformation("Ending Service for  with LogKey {logKey}");
+            _logger.LogInformation($"Ending Service for  with LogKey {logKey}");
         }
 
-        private void Breakstuff()
+        private async Task Breakstuff()
         {
             int x = 0;
             try

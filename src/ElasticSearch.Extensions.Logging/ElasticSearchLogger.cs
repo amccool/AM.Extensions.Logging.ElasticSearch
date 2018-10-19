@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 
 namespace Elasticsearch.Extensions.Logging
 {
-    public class ElasticSearchLogger : ILogger
+    public class ElasticsearchLogger : ILogger
     {
         private const string DocumentType = "doc";
 
@@ -33,7 +33,7 @@ namespace Elasticsearch.Extensions.Logging
         private readonly string _userName;
         private readonly string _machineName;
         
-        public ElasticSearchLogger(string name, Uri endpoint, string indexPrefix, LogLevel logLevel)
+        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix, LogLevel logLevel)
         {
             Name = name;
             

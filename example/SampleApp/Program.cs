@@ -40,11 +40,11 @@ namespace SampleApp
                         .AddElasticSearch(options =>
                         {
                             options.ElasticsearchEndpoint = new Uri(@"http://localhost:9200/");
-                            options.IndexName = "trace";
+                            //options.IndexName = "trace";
                         });
                 });
 
-            // providers may be added to a LoggerFactory before any loggers are created
+            // providers may be added to a LoggerFactory before any loggers are created 
 
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
@@ -92,22 +92,5 @@ namespace SampleApp
             Console.ReadLine();
         }
 
-
-        //private static IServiceProvider ConfigureServices(IServiceCollection serviceCollection)
-        //{
-        //    //setup our DI
-        //    serviceCollection
-        //        .AddSingleton(new LoggerFactory()
-        //            .AddConsole() //LogLevel.Trace)
-        //            //.AddDebug()
-        //            .AddElasticSearch(new Uri(@"http://localhost:9200/")) //, LogLevel.Trace)
-        //        )
-        //        .AddSingleton<IApp, App>();
-            
-        //    // add logging
-        //    serviceCollection.AddLogging();
-
-        //    return serviceCollection.BuildServiceProvider();
-        //}
     }
 }

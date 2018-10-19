@@ -10,38 +10,31 @@ namespace Elasticsearch.Extensions.Logging
     [ProviderAlias("Elasticsearch")]
     public class ElasticsearchLoggerProvider : ILoggerProvider
     {
-
         #region fields
         //private readonly Func<string, LogLevel, bool> _filter;
         private readonly string _indexPrefix;
         private readonly Uri _endpoint;
         private readonly IOptions<LoggerFilterOptions> _filterOptions;
-
         #endregion
 
-        //public ElasticsearchLoggerProvider(Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
-        //{
-        //    this._endpoint = endpoint;
-        //    this._filter = filter;
-        //    this._indexPrefix = indexPrefix;
-        //}
         public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> options, IOptions<LoggerFilterOptions> filterOptions)
         {
+            _indexPrefix = options.CurrentValue.IndexName;
+            _endpoint = options.CurrentValue.ElasticsearchEndpoint;
+
             _filterOptions = filterOptions;
+
             //// Filter would be applied on LoggerFactory level
             //_filter = trueFilter;
             //_optionsReloadToken = options.OnChange(ReloadLoggerOptions);
             //ReloadLoggerOptions(options.CurrentValue);
-
-            _indexPrefix = options.CurrentValue.IndexName;
-            _endpoint = options.CurrentValue.ElasticsearchEndpoint;
         }
 
         public ILogger CreateLogger(string categoryName)
         {
             var logLevel = GetLogLevelForCategoryName(categoryName);
 
-            return new ElasticSearchLogger(categoryName, _endpoint, _indexPrefix, logLevel);
+            return new ElasticsearchLogger(categoryName, _endpoint, _indexPrefix, logLevel);
         }
 
         private LogLevel GetLogLevelForCategoryName(string categoryName)

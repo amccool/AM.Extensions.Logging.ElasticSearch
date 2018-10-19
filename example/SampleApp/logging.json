@@ -10,7 +10,7 @@
         "System": "Error",
         "Microsoft": "Error",
         "SampleApp.Program": "Error",
-        "SampleApp.App": "Error"
+        "SampleApp.App": "Information"
 
       }
     },
