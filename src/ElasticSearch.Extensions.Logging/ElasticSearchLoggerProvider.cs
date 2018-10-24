@@ -1,29 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace ElasticSearch.Extensions.Logging
+namespace Elasticsearch.Extensions.Logging
 {
-    public class ElasticSearchLoggerProvider : ILoggerProvider
+    [ProviderAlias("Elasticsearch")]
+    public class ElasticsearchLoggerProvider : ILoggerProvider
     {
         #region fields
-        private readonly Func<string, LogLevel, bool> _filter;
-
+        //private readonly Func<string, LogLevel, bool> _filter;
         private readonly string _indexPrefix;
         private readonly Uri _endpoint;
+        private readonly IOptions<LoggerFilterOptions> _filterOptions;
         #endregion
 
-        public ElasticSearchLoggerProvider(Uri endpoint, Func<string, LogLevel, bool> filter, string indexPrefix)
+        public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> options, IOptions<LoggerFilterOptions> filterOptions)
         {
-            this._endpoint = endpoint;
-            this._filter = filter;
-            this._indexPrefix = indexPrefix;
+            _indexPrefix = options.CurrentValue.IndexName;
+            _endpoint = options.CurrentValue.ElasticsearchEndpoint;
+
+            _filterOptions = filterOptions;
+
+            //// Filter would be applied on LoggerFactory level
+            //_filter = trueFilter;
+            //_optionsReloadToken = options.OnChange(ReloadLoggerOptions);
+            //ReloadLoggerOptions(options.CurrentValue);
         }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new ElasticSearchLogger(categoryName, _endpoint, _filter, _indexPrefix);
+            var logLevel = GetLogLevelForCategoryName(categoryName);
+
+            return new ElasticsearchLogger(categoryName, _endpoint, _indexPrefix, logLevel);
+        }
+
+        private LogLevel GetLogLevelForCategoryName(string categoryName)
+        {
+            if (_filterOptions == null || _filterOptions.Value == null || _filterOptions.Value.Rules == null)
+                return LogLevel.Warning;
+
+            var providerSpecific = _filterOptions.Value.Rules
+                .Where(x=>!string.IsNullOrEmpty(x.ProviderName))
+                .Where(x => x.ProviderName.Equals("Elasticsearch"))
+                .Where(x =>!string.IsNullOrEmpty(x.CategoryName));
+            if (providerSpecific.Any())
+            {
+                var matched = providerSpecific.FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+                return matched?.LogLevel ?? _filterOptions.Value.MinLevel;
+            }
+            else
+            {
+                return _filterOptions.Value.MinLevel;
+            }
         }
 
         #region IDisposable Support
