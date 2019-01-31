@@ -1,4 +1,4 @@
-# ElasticSearch.Extensions.Logging
+# AM.Extensions.Logging.ElasticSearch
 Microsoft.Extensions.Logging compatible logger posting to ElasticSearch
 
 [![Build status](https://ci.appveyor.com/api/projects/status/4xbcyrkxq39vwt5l?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-extensions-logging)
