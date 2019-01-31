@@ -8,10 +8,10 @@
     <PackageVersionPrefix>x</PackageVersionPrefix>
     <PackageVersionSuffix>x</PackageVersionSuffix>
     <Authors>amccool</Authors>
-    <Product>ElasticSearch.Extensions.Loggingx</Product>
-    <Description>Microsoft.Extensions.Logging piping to ElasticSearch</Description>
+    <Product>AM.Extensions.Logging.ElasticSearch</Product>
+    <Description>Microsoft.Extensions.Logging posting to ElasticSearch</Description>
     <Copyright>2018</Copyright>
-    <PackageTags>ElasticSearch</PackageTags>
+    <PackageTags>ElasticSearch ilogger monitoring kibana Microsoft.Extensions.Logging logging</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

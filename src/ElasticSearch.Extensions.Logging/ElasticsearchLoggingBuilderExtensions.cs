@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
-using Elasticsearch.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elasticsearch.Extensions.Logging
+namespace AM.Extensions.Logging.ElasticSearch
 {
     public static class ElasticsearchLoggingBuilderExtensions
     {

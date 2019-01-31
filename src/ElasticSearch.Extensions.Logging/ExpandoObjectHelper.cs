@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Elasticsearch.Extensions.Logging
+namespace AM.Extensions.Logging.ElasticSearch
 {
     class ExpandoObjectHelper
     {

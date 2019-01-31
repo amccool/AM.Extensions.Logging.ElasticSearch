@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearch.Extensions.Logging\Elasticsearch.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\ElasticSearch.Extensions.Logging\AM.Extensions.Logging.ElasticSearch.csproj" />
   </ItemGroup>
 
   <ItemGroup>

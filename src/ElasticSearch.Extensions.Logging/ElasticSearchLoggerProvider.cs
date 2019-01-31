@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Elasticsearch.Extensions.Logging
+namespace AM.Extensions.Logging.ElasticSearch
 {
     [ProviderAlias("Elasticsearch")]
     public class ElasticsearchLoggerProvider : ILoggerProvider
