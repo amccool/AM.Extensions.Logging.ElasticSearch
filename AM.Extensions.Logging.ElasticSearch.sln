@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2011
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elasticsearch.Extensions.Logging", "src\ElasticSearch.Extensions.Logging\Elasticsearch.Extensions.Logging.csproj", "{4FE1544C-93B8-4BA4-AA77-0B7A902DA2FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Extensions.Logging.ElasticSearch", "src\ElasticSearch.Extensions.Logging\AM.Extensions.Logging.ElasticSearch.csproj", "{4FE1544C-93B8-4BA4-AA77-0B7A902DA2FF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApp", "example\SampleApp\SampleApp.csproj", "{34E5DAE8-4E57-4359-BCD2-8B0ADD00B833}"
 EndProject

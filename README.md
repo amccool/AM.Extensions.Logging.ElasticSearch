@@ -1,4 +1,4 @@
-# ElasticSearch.Extensions.Logging
+# AM.Extensions.Logging.ElasticSearch
 Microsoft.Extensions.Logging compatible logger posting to ElasticSearch
 
 [![Build status](https://ci.appveyor.com/api/projects/status/4xbcyrkxq39vwt5l?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-extensions-logging)
@@ -10,16 +10,16 @@ Microsoft.Extensions.Logging compatible logger posting to ElasticSearch
 ElasticSearch Logger is a ILogger based logger which submits events and data to ElasticSearch making them viewable with Kibana
 
 
-[![nuget downloads](https://img.shields.io/nuget/dt/AM.ElasticSearch.Extensions.Logging.svg)](https://www.nuget.org/packages/AM.ElasticSearch.Extensions.Logging/)
-[![nuget version](https://img.shields.io/nuget/v/AM.ElasticSearch.Extensions.Logging.svg)](https://www.nuget.org/packages/AM.ElasticSearch.Extensions.Logging/)
+[![nuget downloads](https://img.shields.io/nuget/dt/AM.Extensions.Logging.ElasticSearch.svg)](https://www.nuget.org/packages/AM.Extensions.Logging.ElasticSearch/)
+[![nuget version](https://img.shields.io/nuget/v/AM.Extensions.Logging.ElasticSearch.svg)](https://www.nuget.org/packages/AM.Extensions.Logging.ElasticSearch/)
 
 
 ## Getting Started
 
-Install the package from nuget.org https://www.nuget.org/packages/AM.ElasticSearch.Extensions.Logging
+Install the package from nuget.org https://www.nuget.org/packages/AM.Extensions.Logging.ElasticSearch
 
 ```ps
-Install-Package AM.ElasticSearch.Extensions.Logging
+Install-Package AM.Extensions.Logging.ElasticSearch
 ```
 
 

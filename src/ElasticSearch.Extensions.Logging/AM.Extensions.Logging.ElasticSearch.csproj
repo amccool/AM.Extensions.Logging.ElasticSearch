@@ -1,17 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>AM.ElasticSearch.Extensions.Logging</PackageId>
+    <PackageId>AM.Extensions.Logging.ElasticSearch</PackageId>
     <Version>1.0.3</Version>
     <PackageVersion>1.0.3</PackageVersion>
     <PackageVersionPrefix>x</PackageVersionPrefix>
     <PackageVersionSuffix>x</PackageVersionSuffix>
     <Authors>amccool</Authors>
-    <Product>ElasticSearch.Extensions.Loggingx</Product>
-    <Description>Microsoft.Extensions.Logging piping to ElasticSearch</Description>
+    <Product>AM.Extensions.Logging.ElasticSearch</Product>
+    <Description>Microsoft.Extensions.Logging posting to ElasticSearch</Description>
     <Copyright>2018</Copyright>
-    <PackageTags>ElasticSearch</PackageTags>
+    <PackageTags>ElasticSearch ilogger monitoring kibana Microsoft.Extensions.Logging logging</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

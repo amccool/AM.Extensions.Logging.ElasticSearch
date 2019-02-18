@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Elasticsearch.Extensions.Logging
+namespace AM.Extensions.Logging.ElasticSearch
 {
     public class ElasticsearchLoggerOptions
     {
