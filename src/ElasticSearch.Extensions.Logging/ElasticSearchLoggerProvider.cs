@@ -46,7 +46,7 @@ namespace AM.Extensions.Logging.ElasticSearch
                 .Where(x =>!string.IsNullOrEmpty(x.CategoryName));
             if (providerSpecific.Any())
             {
-                var matched = providerSpecific.FirstOrDefault(x => x.CategoryName.Equals(categoryName));
+                var matched = providerSpecific.FirstOrDefault(x => categoryName.Contains(x.CategoryName));
                 return matched?.LogLevel ?? _filterOptions.Value.MinLevel;
             }
             else

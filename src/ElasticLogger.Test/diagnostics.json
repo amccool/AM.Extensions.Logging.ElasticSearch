@@ -1,0 +1,14 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Trace"
+    },
+    "Elasticsearch": {
+      "IncludeScopes": "true",
+        "LogLevel": {
+            "Default": "Trace"
+            //"My.Bananas.Trace":  "Trace" 
+        }
+    }
+  }
+}

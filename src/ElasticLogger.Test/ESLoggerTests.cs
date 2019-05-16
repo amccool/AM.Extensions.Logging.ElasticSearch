@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AM.Extensions.Logging.ElasticSearch;
 using Elasticsearch.Net;
@@ -68,6 +69,16 @@ namespace ElasticLogger.Test
             var reader = new StreamReader(stream);
 
             var huh = await reader.ReadToEndAsync();
+        }
+
+        [Fact]
+        public async Task LoggingThing()
+        {
+            var factory = new CustomWebApplicationFactory<Startup>();
+
+            var client = factory.CreateClient();
+
+            await client.GetAsync("/");
         }
 
     }
