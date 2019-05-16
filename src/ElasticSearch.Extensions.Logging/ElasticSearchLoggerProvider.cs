@@ -30,30 +30,12 @@ namespace AM.Extensions.Logging.ElasticSearch
 
         public ILogger CreateLogger(string categoryName)
         {
-            var logLevel = GetLogLevelForCategoryName(categoryName);
+            var logLevel = _filterOptions.GetLogLevelForCategoryName(categoryName);
 
             return new ElasticsearchLogger(categoryName, _endpoint, _indexPrefix, logLevel);
         }
 
-        private LogLevel GetLogLevelForCategoryName(string categoryName)
-        {
-            if (_filterOptions == null || _filterOptions.Value == null || _filterOptions.Value.Rules == null)
-                return LogLevel.Warning;
-
-            var providerSpecific = _filterOptions.Value.Rules
-                .Where(x=>!string.IsNullOrEmpty(x.ProviderName))
-                .Where(x => x.ProviderName.Equals("Elasticsearch"))
-                .Where(x =>!string.IsNullOrEmpty(x.CategoryName));
-            if (providerSpecific.Any())
-            {
-                var matched = providerSpecific.FirstOrDefault(x => categoryName.Contains(x.CategoryName));
-                return matched?.LogLevel ?? _filterOptions.Value.MinLevel;
-            }
-            else
-            {
-                return _filterOptions.Value.MinLevel;
-            }
-        }
+        
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
