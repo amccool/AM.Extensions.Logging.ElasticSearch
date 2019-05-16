@@ -30,27 +30,6 @@ namespace AM.Extensions.Logging.ElasticSearch
                 IndexName = indexPrefix
             });
         }
-        //public static ILoggerFactory AddElasticSearch(this ILoggerFactory factory, Uri endpoint, LogLevel minLevel)
-        //{
-        //    return AddElasticSearch(factory, endpoint, (n, l) => l >= minLevel, "trace");
-        //}
-
-        //public static ILoggerFactory AddElasticSearch(this ILoggerFactory factory, Uri endpoint, LogLevel filter, string indexPrefix)
-        //{
-        //    var x = new OptionsMonitor< ElasticsearchLoggerOptions >(new OptionsFactory<ElasticsearchLoggerOptions>(), )
-
-
-
-        //    var o = new ElasticsearchLoggerOptions()
-        //    {
-        //        ElasticsearchEndpoint = endpoint,
-        //        IndexName = indexPrefix
-        //    };
-        //    factory.AddProvider(new ElasticsearchLoggerProvider(, 
-        //        endpoint, filter, indexPrefix));
-        //    return factory;
-        //}
-
 
         public static ILoggerFactory AddElasticSearch(this ILoggerFactory loggerFactory, ElasticsearchLoggerOptions options)
         {

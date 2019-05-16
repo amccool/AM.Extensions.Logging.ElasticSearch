@@ -32,7 +32,7 @@ namespace AM.Extensions.Logging.ElasticSearch
         private readonly string _userName;
         private readonly string _machineName;
         
-        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix)//, LogLevel logLevel)
+        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix)
         {
             Name = name;
             
@@ -81,8 +81,6 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
         }
 
-
-
         private void Initialize()
         {
             //SetupObserver();
@@ -111,9 +109,6 @@ namespace AM.Extensions.Logging.ElasticSearch
                 .Buffer(TimeSpan.FromSeconds(1), 10)
                 .Subscribe(async x => await this.WriteDirectlyToESAsBatch(x));
         }
-
-
-
 
         public IDisposable BeginScope<TState>(TState state)
         {
@@ -150,11 +145,7 @@ namespace AM.Extensions.Logging.ElasticSearch
             WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
         }
 
-
-
-
         protected void WriteTrace(
-            //TraceEventCache eventCache,
             string loggerName,
             LogLevel eventType,
             int id,
@@ -162,12 +153,6 @@ namespace AM.Extensions.Logging.ElasticSearch
             Guid? relatedActivityId,
             object data)
         {
-
-            //if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
-            //{
-            //    return;
-            //}
-
             string updatedMessage = message;
             JObject payload = null;
             var serializerIgnoreReferenceLoop = new JsonSerializer { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
@@ -234,15 +219,8 @@ namespace AM.Extensions.Logging.ElasticSearch
                 }
             }
 
-            //Debug.Assert(!string.IsNullOrEmpty(updatedMessage));
-            //Debug.Assert(payload != null);
-
             InternalWrite(new TraceEventCache(), loggerName, eventType, id, updatedMessage, relatedActivityId, payload);
         }
-
-
-
-
 
         private void InternalWrite(
                     TraceEventCache eventCache,
@@ -254,13 +232,6 @@ namespace AM.Extensions.Logging.ElasticSearch
                     relatedActivityId,
                     JObject dataObject)
         {
-
-            //var timeStamp = DateTime.UtcNow.ToString("o");
-            //var source = Process.GetCurrentProcess().ProcessName;
-            //var stacktrace = Environment.StackTrace;
-            //var methodName = (new StackTrace()).GetFrame(StackTrace.METHODS_TO_SKIP + 4).GetMethod().Name;
-
-
             DateTime logTime;
             string logicalOperationStack = null;
             if (eventCache != null)
@@ -321,8 +292,6 @@ namespace AM.Extensions.Logging.ElasticSearch
                 Debug.WriteLine(ex);
             }
         }
-
-
 
         private async Task WriteDirectlyToES(JObject jo)
         {
