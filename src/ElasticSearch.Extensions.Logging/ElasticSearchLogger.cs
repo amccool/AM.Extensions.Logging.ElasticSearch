@@ -32,13 +32,15 @@ namespace AM.Extensions.Logging.ElasticSearch
         private readonly string _userName;
         private readonly string _machineName;
         
-        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix, LogLevel logLevel)
+        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix)//, LogLevel logLevel)
         {
             Name = name;
             
             _endpoint = endpoint;
             _indexPrefix = indexPrefix;
-            _logLevel = logLevel;
+
+            // Default is to turn on all the logging
+            _logLevel = LogLevel.Trace;
 
             _userDomainName = Environment.UserDomainName;
             _userName = Environment.UserName;
@@ -120,7 +122,7 @@ namespace AM.Extensions.Logging.ElasticSearch
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _logLevel <= logLevel;
+            return logLevel != LogLevel.None && logLevel >= _logLevel;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, 
