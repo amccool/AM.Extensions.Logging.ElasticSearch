@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Nest;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -48,7 +49,7 @@ namespace ElasticLogger.Test
 
                 logger.Log(LogLevel.Critical, new EventId(), circularRefObj, null, (circle, exception) => "");
 
-                var delayTask = Task.Delay(TimeSpan.FromSeconds(2));
+                var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
                 var client = new ElasticClient(new ConnectionSettings(elasticsearch.Url));
                 await client.PingAsync();
                 await delayTask;
@@ -56,14 +57,24 @@ namespace ElasticLogger.Test
                 var resp = await client.CatIndicesAsync();
 
                 Assert.Single(resp.Records);
+
+
+                var dyndocs = await client.SearchAsync<dynamic>(s => s
+                    //.Index("trace-*")
+                    .AllIndices()
+                    .AllTypes());
+
+                Assert.Single(dyndocs.Documents);
             }
         }
 
         [Fact]
         public async Task FullESTest()
         {
-            using (var elasticsearch = new ElasticsearchInside.Elasticsearch(c => c.SetElasticsearchStartTimeout(60)
-                .EnableLogging().LogTo(s => _output.WriteLine(s ?? string.Empty))))
+            using (var elasticsearch = new ElasticsearchInside.Elasticsearch(c =>
+                c.SetElasticsearchStartTimeout(60)
+                .EnableLogging().LogTo(s => _output.WriteLine(s ?? string.Empty))
+                ))
             {
                 await elasticsearch.Ready();
                 var client = new ElasticClient(new ConnectionSettings(elasticsearch.Url));
@@ -81,6 +92,36 @@ namespace ElasticLogger.Test
                 var tweetResp = response;
                 var tweetResp2 = response2.Source;
                 Assert.Equal(tweet, tweetResp2);
+
+                var dyndocs = await client.SearchAsync<dynamic>(s => s
+                    .Index("mytweetindex")
+                    .AllTypes());
+                    //.AllIndices());
+                //.From(0)
+                //.Size(100)
+                //.Query(q => q.
+                //    Match(m => m.
+                //        Field("User")
+                //        .Query("kimchy"))));
+
+                Assert.Single(dyndocs.Documents);
+
+
+                var docs = await client.SearchAsync<Tweet>(s => s
+                    .Index("mytweetindex")
+                    .AllTypes());
+                    //.AllIndices()
+                    //.From(0)
+                    //.Size(100)
+                    //.Query(q => q.
+                    //    Match(m => m.
+                    //        Field("User")
+                    //        .Query("kimchy"))));
+
+                Assert.Single(docs.Documents);
+
+
+
             }
         }
 
