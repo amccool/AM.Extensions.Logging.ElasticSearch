@@ -347,5 +347,433 @@ namespace ElasticLogger.Test
 
             Assert.Single(dyndocs.Documents);
         }
+
+
+        [Fact]
+        public async Task Missing_ElasticSearch_Section_In_Config_Should_Use_Logging_Defaults_Negative_Match()
+        {
+            var source = "I.Need.A.New.Source";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"}
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogTrace("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Empty(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Missing_ElasticSearch_Section_In_Config_Should_Use_Logging_Defaults_Positive_Match()
+        {
+            var source = "My.Apples.Trace";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"}
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogError("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Single(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Existing_ElasticSearch_Section_In_Config_Should_Be_Used_For_Log_Levels_Positive_Match()
+        {
+            var source = "Tangerine.Peel";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"}
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogTrace("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Empty(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Existing_ElasticSearch_Section_In_Config_Should_Be_Used_For_Log_Levels_Negative_Match()
+        {
+            var source = "Tangerine.Seeds";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"}
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogCritical("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Single(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Existing_ElasticSearch_Section_With_Category_Should_Match_Top_Level_Positive_Match()
+        {
+            var source = "Grapes.Peel";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"},
+                        {"Logging:Elasticsearch:LogLevel:Grapes", "Information"},
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogInformation("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Single(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Existing_ElasticSearch_Section_With_Category_Should_Match_Top_Level_Negative_Match()
+        {
+            var source = "Apples.Peel";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"},
+                        {"Logging:Elasticsearch:LogLevel:Grapes", "Information"},
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogInformation("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Empty(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Existing_ElasticSearch_Section_With_Category_Should_Match_Bottom_Level_Positive_Match()
+        {
+            var source = "Pears.Peel";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"},
+                        {"Logging:Elasticsearch:LogLevel:Grapes.Peel", "Error"},
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogCritical("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Single(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Existing_ElasticSearch_Section_With_Category_Should_Match_Bottom_Level_Negative_Match()
+        {
+            var source = "Pears.Peel";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"},
+                        {"Logging:Elasticsearch:LogLevel:Grapes.Peel", "Error"},
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogInformation("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Single(dyndocs.Documents);
+        }
+
     }
 }
