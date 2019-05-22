@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nest;
 using Xunit.Abstractions;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ElasticLogger.Test
 {
@@ -198,9 +199,63 @@ namespace ElasticLogger.Test
 
 
         [Fact]
-        public async Task Write_critical_log_with_no_config()
+        public async Task Write_None_log_with_no_config_negativeTest()
         {
-            var source = "xxxxxxx";
+            var logLevel = LogLevel.None;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterNegative(source, logLevel);
+        }
+
+        [Fact]
+        public async Task Write_Critical_log_with_no_config_positiveTest()
+        {
+            var logLevel = LogLevel.Critical;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterPositive(source, logLevel);
+        }
+
+        [Fact]
+        public async Task Write_Error_log_with_no_config_positiveTest()
+        {
+            var logLevel = LogLevel.Error;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterPositive(source, logLevel);
+        }
+
+        [Fact]
+        public async Task Write_Warning_log_with_no_config_positiveTest()
+        {
+            var logLevel = LogLevel.Warning;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterPositive(source, logLevel);
+        }
+
+        [Fact]
+        public async Task Write_Information_log_with_no_config_positiveTest()
+        {
+            var logLevel = LogLevel.Information;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterPositive(source, logLevel);
+        }
+
+        [Fact]
+        public async Task Write_Debug_log_with_no_config_positiveTest()
+        {
+            var logLevel = LogLevel.Debug;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterPositive(source, logLevel);
+        }
+
+        [Fact]
+        public async Task Write_Trace_log_with_no_config_positiveTest()
+        {
+            var logLevel = LogLevel.Trace;
+            var source = "xxxxxxx" + logLevel.ToString();
+            await LevelTesterPositive(source, logLevel);
+        }
+
+        private async Task LevelTesterPositive(string source, LogLevel logLevel)
+        {
             await _fixture.ReadyAsync();
 
             ILoggerFactory loggerFactory = new LoggerFactory()
@@ -211,15 +266,12 @@ namespace ElasticLogger.Test
             var circularRefObj = new Circle();
             circularRefObj.me = circularRefObj;
 
-            logger.Log(Microsoft.Extensions.Logging.LogLevel.Critical, new EventId(), circularRefObj, null, (circle, exception) => "");
+            logger.Log(logLevel, new EventId(), circularRefObj, null, (circle, exception) => "");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
-
-            //var resp = await client.CatIndicesAsync();
-            //Assert.Single(resp.Records);
 
             var dyndocs = await client.SearchAsync<dynamic>(s => s
                 .AllIndices()
@@ -234,7 +286,37 @@ namespace ElasticLogger.Test
             Assert.Single(dyndocs.Documents);
         }
 
+        private async Task LevelTesterNegative(string source, LogLevel logLevel)
+        {
+            await _fixture.ReadyAsync();
 
+            ILoggerFactory loggerFactory = new LoggerFactory()
+                .AddElasticSearch(_fixture.Endpoint);
+
+            var logger = loggerFactory.CreateLogger(source);
+
+            var circularRefObj = new Circle();
+            circularRefObj.me = circularRefObj;
+
+            logger.Log(logLevel, new EventId(), circularRefObj, null, (circle, exception) => "");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Empty(dyndocs.Documents);
+        }
 
 
         [Fact]
@@ -265,8 +347,5 @@ namespace ElasticLogger.Test
 
             Assert.Single(dyndocs.Documents);
         }
-
-
-
     }
 }
