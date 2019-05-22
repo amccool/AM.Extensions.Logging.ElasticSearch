@@ -174,6 +174,7 @@ namespace AM.Extensions.Logging.ElasticSearch
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
+                    _queueToBePosted.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

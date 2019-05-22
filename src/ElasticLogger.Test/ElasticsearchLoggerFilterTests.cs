@@ -61,7 +61,7 @@ namespace ElasticLogger.Test
 
             logger.LogTrace("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(2));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -122,7 +122,7 @@ namespace ElasticLogger.Test
 
             logger.LogTrace("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -178,7 +178,7 @@ namespace ElasticLogger.Test
 
             logger.LogTrace("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -268,7 +268,7 @@ namespace ElasticLogger.Test
 
             logger.Log(logLevel, new EventId(), circularRefObj, null, (circle, exception) => "");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -300,7 +300,7 @@ namespace ElasticLogger.Test
 
             logger.Log(logLevel, new EventId(), circularRefObj, null, (circle, exception) => "");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -339,7 +339,7 @@ namespace ElasticLogger.Test
             var tweetResp2 = response2.Source;
             Assert.Equal(tweet, tweetResp2);
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(3));
 
             var dyndocs = await client.SearchAsync<dynamic>(s => s
                 .Index("mytweetindex")
@@ -383,7 +383,7 @@ namespace ElasticLogger.Test
 
             logger.LogTrace("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -435,7 +435,7 @@ namespace ElasticLogger.Test
 
             logger.LogError("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -488,7 +488,7 @@ namespace ElasticLogger.Test
 
             logger.LogTrace("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -541,7 +541,7 @@ namespace ElasticLogger.Test
 
             logger.LogCritical("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -595,7 +595,7 @@ namespace ElasticLogger.Test
 
             logger.LogInformation("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -649,7 +649,7 @@ namespace ElasticLogger.Test
 
             logger.LogInformation("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -703,7 +703,7 @@ namespace ElasticLogger.Test
 
             logger.LogCritical("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
@@ -757,7 +757,7 @@ namespace ElasticLogger.Test
 
             logger.LogInformation("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(3));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
