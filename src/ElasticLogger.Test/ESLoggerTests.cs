@@ -1,61 +1,42 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AM.Extensions.Logging.ElasticSearch;
 using Elasticsearch.Net;
 using ElasticsearchInside;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Nest;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ElasticLogger.Test
 {
     public class ESLoggerTests
     {
-        [Fact(Skip = "Skipping because the factory extensions have been removed")]
-        public async Task Test1()
+        private readonly ITestOutputHelper _output;
+
+        public ESLoggerTests(ITestOutputHelper outputHelper)
         {
-            //using (var elasticsearch = new ElasticsearchInside.Elasticsearch())
-            //{
-            //    ////Arrange
-            //    await elasticsearch.Ready();
-            //    //var client = new ElasticClient(new ConnectionSettings(elasticsearch.Url));
-
-            //    ILoggerFactory loggerFactory = new LoggerFactory()
-            //        .AddElasticSearch(elasticsearch.Url,
-            //            LogLevel.Trace);
-
-
-            //    var logger = loggerFactory.CreateLogger("xxxxxxx");
-
-            //    var circularRefObj = new Circle();
-            //    circularRefObj.me = circularRefObj;
-
-
-            //    logger.Log(LogLevel.Critical, new EventId(), circularRefObj, null, (circle, exception) => "");
-
-            //}
-
+            _output = outputHelper;
         }
 
-        [Fact]
-        public void Test2()
-        {
-            bool on = true;
 
-            Assert.True(on);
-
-        }
 
         [Fact]
         public async Task TryingToBreakThisThing()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-            };
+            JsonSerializerSettings settings = new JsonSerializerSettings { };
 
             Circle sillyCircle = new Circle{me = null};
             sillyCircle.me = sillyCircle;
@@ -80,11 +61,5 @@ namespace ElasticLogger.Test
 
             await client.GetAsync("/");
         }
-
-    }
-
-    public class Circle
-    {
-        public Circle me { get; set; }
     }
 }
