@@ -26,18 +26,19 @@ namespace ElasticLogger.Test
         [Fact]
         public async Task No_categories_for_es_should_use_default()
         {
-            await _fixture.ReadyAsync();
+            var source = "My.Bananas.Trace";
 
+            await _fixture.ReadyAsync();
 
             var config = new ConfigurationBuilder()
                 .Add(new MemoryConfigurationSource
                 {
                     InitialData = new Dictionary<string, string>
                     {
-                            {"Logging:Elasticsearch:IncludeScopes", "true"},
-                            {"Logging:Elasticsearch:LogLevel:Default", "Error"},
-                            {"Logging:Elasticsearch:LogLevel:My.Bananas.Trace", "Trace"},
-                            {"Logging:LogLevel:Default", "Information"}
+                        {"Logging:Elasticsearch:IncludeScopes", "true"},
+                        {"Logging:Elasticsearch:LogLevel:Default", "Error"},
+                        {"Logging:Elasticsearch:LogLevel:" + source, "Trace"},
+                        {"Logging:LogLevel:Default", "Information"}
                     }
                 })
                 .Build();
@@ -55,35 +56,38 @@ namespace ElasticLogger.Test
                 .BuildServiceProvider();
 
             var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger("My.Bananas.Trace");
+            var logger = loggerFactory.CreateLogger(source);
 
             logger.LogTrace("bananas taste yucky");
 
-            var delayTask = Task.Delay(TimeSpan.FromSeconds(2));
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
             var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
-            var resp = await client.CatIndicesAsync();
-
-            Assert.Single(resp.Records);
+            //not 
+            //var resp = await client.CatIndicesAsync();
+            //Assert.Single(resp.Records);
 
             var dyndocs = await client.SearchAsync<dynamic>(s => s
                 //.Index("trace-*")
                 .AllIndices()
-                .AllTypes());
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
 
             Assert.Single(dyndocs.Documents);
-
         }
 
 
         [Fact]
         public async Task configured_categories_dont_log_for_config()
         {
-
-            var categoryName = "Billy.bob";
-
+            var source = "Billy.bob";
 
             await _fixture.ReadyAsync();
 
@@ -94,7 +98,7 @@ namespace ElasticLogger.Test
                     {
                         {"Logging:Elasticsearch:IncludeScopes", "true"},
                         {"Logging:Elasticsearch:LogLevel:Default", "Error"},
-                        {"Logging:Elasticsearch:LogLevel:" + categoryName, "Error"},
+                        {"Logging:Elasticsearch:LogLevel:" + source, "Error"},
                         {"Logging:LogLevel:Default", "Error"}
                     }
                 })
@@ -113,7 +117,7 @@ namespace ElasticLogger.Test
                 .BuildServiceProvider();
 
             var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger(categoryName);
+            var logger = loggerFactory.CreateLogger(source);
 
             logger.LogTrace("bananas taste yucky");
 
@@ -122,24 +126,28 @@ namespace ElasticLogger.Test
             await client.PingAsync();
             await delayTask;
 
-            var resp = await client.CatIndicesAsync();
-
-            Assert.Empty(resp.Records);
-
+            //var resp = await client.CatIndicesAsync();
+            //Assert.Empty(resp.Records);
 
             var dyndocs = await client.SearchAsync<dynamic>(s => s
                 //.Index("trace-*")
                 .AllIndices()
-                .AllTypes());
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
 
             Assert.Single(dyndocs.Documents);
-
         }
 
 
         [Fact]
         public async Task No_elasticsearch_section_should_use_default_log_level()
         {
+            var source = "bizarro";
             await _fixture.ReadyAsync();
 
             var config = new ConfigurationBuilder()
@@ -151,7 +159,6 @@ namespace ElasticLogger.Test
                                 }
                             })
                             .Build();
-
 
             var serviceProvider = new ServiceCollection()
                 .AddLogging(x =>
@@ -166,7 +173,7 @@ namespace ElasticLogger.Test
                 .BuildServiceProvider();
 
             var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger("My.Bananas.Trace");
+            var logger = loggerFactory.CreateLogger(source);
 
             logger.LogTrace("bananas taste yucky");
 
@@ -175,50 +182,31 @@ namespace ElasticLogger.Test
             await client.PingAsync();
             await delayTask;
 
-            var resp = await client.CatIndicesAsync();
-
-            Assert.Single(resp.Records);
-
-            var inm = new IndexName();
-            inm.Name = "trace-*";
-            var i = Indices.Index(inm);
-
-            var indxResponse = await client.GetIndexAsync(Indices.Index("trace-*"));
-
-            Assert.Single(indxResponse.Indices);
-
-            //s=>s.Index(Indices.AllIndices).
-
-            //var tester = client.SearchAsync<dynamic>(s => s.From(0).Size(1)
-            //    .Query(q => q
-            //        .Terms(t => t
-            //            .Name("named_query")
-            //            .Boost(1.1f)
-            //            .Field("cvrNummer")
-            //            .Terms("36406208"))));
-
-
-            var docs = await client.SearchAsync<dynamic>(s => s
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
                 .AllIndices()
-                .From(0)
-                .Size(100));
-            //.Query(q=>q.Match(m=>m.Field(f=>f)))
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
 
-            Assert.Single(docs.Documents);
-
+            Assert.Single(dyndocs.Documents);
 
         }
 
 
         [Fact]
-        public async Task FullESWriteTest()
+        public async Task Write_critical_log_with_no_config()
         {
+            var source = "xxxxxxx";
             await _fixture.ReadyAsync();
 
             ILoggerFactory loggerFactory = new LoggerFactory()
                 .AddElasticSearch(_fixture.Endpoint);
 
-            var logger = loggerFactory.CreateLogger("xxxxxxx");
+            var logger = loggerFactory.CreateLogger(source);
 
             var circularRefObj = new Circle();
             circularRefObj.me = circularRefObj;
@@ -230,15 +218,18 @@ namespace ElasticLogger.Test
             await client.PingAsync();
             await delayTask;
 
-            var resp = await client.CatIndicesAsync();
-
-            Assert.Single(resp.Records);
-
+            //var resp = await client.CatIndicesAsync();
+            //Assert.Single(resp.Records);
 
             var dyndocs = await client.SearchAsync<dynamic>(s => s
-                //.Index("trace-*")
                 .AllIndices()
-                .AllTypes());
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
 
             Assert.Single(dyndocs.Documents);
         }
@@ -247,53 +238,32 @@ namespace ElasticLogger.Test
 
 
         [Fact]
-        public async Task FullSimpleESTest()
+        public async Task Load_ES_with_explicit_type_write_and_search()
         {
-                await _fixture.ReadyAsync();
-                var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
-                await client.PingAsync();
+            await _fixture.ReadyAsync();
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
 
-                var tweet = new Tweet
-                {
-                    Id = 1,
-                    User = "kimchy",
-                    PostDate = new DateTime(2009, 11, 15),
-                    Message = "Trying out NEST, so far so good?"
-                };
-                var response = await client.IndexAsync(tweet, idx => idx.Index("mytweetindex"));
-                var response2 = client.Get<Tweet>(1, idx => idx.Index("mytweetindex"));
-                var tweetResp = response;
-                var tweetResp2 = response2.Source;
-                Assert.Equal(tweet, tweetResp2);
+            var tweet = new Tweet
+            {
+                Id = 1,
+                User = "kimchy",
+                PostDate = new DateTime(2009, 11, 15),
+                Message = "Trying out NEST, so far so good?"
+            };
+            var response = await client.IndexAsync(tweet, idx => idx.Index("mytweetindex"));
+            var response2 = client.Get<Tweet>(1, idx => idx.Index("mytweetindex"));
+            var tweetResp = response;
+            var tweetResp2 = response2.Source;
+            Assert.Equal(tweet, tweetResp2);
 
-                await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(5));
 
-                var dyndocs = await client.SearchAsync<dynamic>(s => s
-                    .Index("mytweetindex")
-                    .AllTypes());
-                //.AllIndices());
-                //.From(0)
-                //.Size(100)
-                //.Query(q => q.
-                //    Match(m => m.
-                //        Field("User")
-                //        .Query("kimchy"))));
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .Index("mytweetindex")
+                .AllTypes());
 
-                Assert.Single(dyndocs.Documents);
-
-
-                var docs = await client.SearchAsync<Tweet>(s => s
-                    .Index("mytweetindex")
-                    .AllTypes());
-                //.AllIndices()
-                //.From(0)
-                //.Size(100)
-                //.Query(q => q.
-                //    Match(m => m.
-                //        Field("User")
-                //        .Query("kimchy"))));
-
-                Assert.Single(docs.Documents);
+            Assert.Single(dyndocs.Documents);
         }
 
 
