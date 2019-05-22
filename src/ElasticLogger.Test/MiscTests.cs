@@ -22,11 +22,11 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ElasticLogger.Test
 {
-    public class ESLoggerTests
+    public class MiscTests
     {
         private readonly ITestOutputHelper _output;
 
-        public ESLoggerTests(ITestOutputHelper outputHelper)
+        public MiscTests(ITestOutputHelper outputHelper)
         {
             _output = outputHelper;
         }
