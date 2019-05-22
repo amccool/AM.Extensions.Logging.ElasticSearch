@@ -140,7 +140,7 @@ namespace ElasticLogger.Test
                     ))
             );
 
-            Assert.Single(dyndocs.Documents);
+            Assert.Empty(dyndocs.Documents);
         }
 
 
