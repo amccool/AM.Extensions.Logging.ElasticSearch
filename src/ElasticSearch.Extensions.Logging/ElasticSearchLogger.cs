@@ -21,23 +21,17 @@ namespace AM.Extensions.Logging.ElasticSearch
 {
     public class ElasticsearchLogger : ILogger
     {
-        private const string DocumentType = "doc";
 
-        private IElasticLowLevelClient _client;
-        private readonly Uri _endpoint;
-        private readonly string _indexPrefix;
         private readonly LogLevel _logLevel;
-        private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
         private readonly string _userDomainName;
         private readonly string _userName;
         private readonly string _machineName;
-        
-        public ElasticsearchLogger(string name, Uri endpoint, string indexPrefix)
+        private readonly Action<JObject> _scribeProcessor;
+
+        public ElasticsearchLogger(string categoryName, Action<JObject> scribeProcessor)
         {
-            Name = name;
-            
-            _endpoint = endpoint;
-            _indexPrefix = indexPrefix;
+            Name = categoryName;
+            _scribeProcessor = scribeProcessor;
 
             // Default is to turn on all the logging
             _logLevel = LogLevel.Trace;
@@ -45,70 +39,28 @@ namespace AM.Extensions.Logging.ElasticSearch
             _userDomainName = Environment.UserDomainName;
             _userName = Environment.UserName;
             _machineName = Environment.MachineName;
-            Initialize();
+
         }
 
-        /// <summary>
-        /// prefix for the Index for traces
-        /// </summary>
-        private string Index => this._indexPrefix.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
+        //public ElasticsearchLogger(string categoryName, Uri endpoint, string indexPrefix)
+        //{
+        //    Name = categoryName;
+            
+        //    _endpoint = endpoint;
+        //    _indexPrefix = indexPrefix;
+
+        //    // Default is to turn on all the logging
+        //    _logLevel = LogLevel.Trace;
+
+        //    _userDomainName = Environment.UserDomainName;
+        //    _userName = Environment.UserName;
+        //    _machineName = Environment.MachineName;
+        //    Initialize();
+        //}
 
         public string Name { get; }
         
-        public IElasticLowLevelClient Client
-        {
-            get
-            {
-                if (_client != null)
-                {
-                    return _client;
-                }
-                else
-                {
-                    var singleNode = new SingleNodeConnectionPool(_endpoint);
 
-                    var cc = new ConnectionConfiguration(singleNode,
-                            connectionSettings => new ElasticsearchJsonNetSerializer())
-                        .EnableHttpPipelining()
-                        .ThrowExceptions();
-
-                    //the 1.x serializer we needed to use, as the default SimpleJson didnt work right
-                    //Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer()
-
-                    this._client = new ElasticLowLevelClient(cc);
-                    return this._client;
-                }
-            }
-        }
-
-        private void Initialize()
-        {
-            //SetupObserver();
-            SetupObserverBatchy();
-        }
-
-        private Action<JObject> _scribeProcessor;
-        private List<Func<string, string, LogLevel, bool>> _filter;
-
-        private void SetupObserver()
-        {
-            _scribeProcessor = a => WriteDirectlyToES(a);
-
-            //this._queueToBePosted.GetConsumingEnumerable()
-            //.ToObservable(Scheduler.Default)
-            //.Subscribe(x => WriteDirectlyToES(x));
-        }
-
-
-        private void SetupObserverBatchy()
-        {
-            _scribeProcessor = a => WriteToQueueForprocessing(a);
-
-            this._queueToBePosted.GetConsumingEnumerable()
-                .ToObservable(Scheduler.Default)
-                .Buffer(TimeSpan.FromSeconds(1), 10)
-                .Subscribe(async x => await this.WriteDirectlyToESAsBatch(x));
-        }
 
         public IDisposable BeginScope<TState>(TState state)
         {
@@ -293,43 +245,7 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
         }
 
-        private async Task WriteDirectlyToES(JObject jo)
-        {
-            try
-            {
-                await Client.IndexAsync<VoidResponse>(Index, DocumentType, jo.ToString());
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-        }
 
-        private async Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
-        {
-            if (!jos.Any())
-                return;
-
-            var indx = new { index = new { _index = Index, _type = DocumentType } };
-            var indxC = Enumerable.Repeat(indx, jos.Count());
-
-            var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
-            var bbo = bb.SelectMany(a => a);
-
-            try
-            {
-                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-        }
-
-        private void WriteToQueueForprocessing(JObject jo)
-        {
-            this._queueToBePosted.Add(jo);
-        }
 
 
     }
