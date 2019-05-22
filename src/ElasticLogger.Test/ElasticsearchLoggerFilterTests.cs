@@ -266,7 +266,108 @@ namespace ElasticLogger.Test
             Assert.Single(dyndocs.Documents);
         }
 
+        [Fact]
+        public async Task Missing_ElasticSearch_Section_In_Config_Should_Use_Logging_Defaults_Negative_Match()
+        {
+            var source = "I.Need.A.New.Source";
 
+            await _fixture.ReadyAsync();
 
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"}
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogTrace("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Empty(dyndocs.Documents);
+        }
+
+        [Fact]
+        public async Task Missing_ElasticSearch_Section_In_Config_Should_Use_Logging_Defaults_Positive_Match()
+        {
+            var source = "My.Apples.Trace";
+
+            await _fixture.ReadyAsync();
+
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                        {"Logging:LogLevel:Default", "Information"}
+                    }
+                })
+                .Build();
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(x =>
+                {
+                    x.AddConfiguration(config.GetSection("Logging"));
+                    x.AddElasticSearch(options =>
+                    {
+                        options.ElasticsearchEndpoint = _fixture.Endpoint;
+                        options.IndexName = "trace";
+                    });
+                })
+                .BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger(source);
+
+            logger.LogError("bananas taste yucky");
+
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
+            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            await client.PingAsync();
+            await delayTask;
+
+            var dyndocs = await client.SearchAsync<dynamic>(s => s
+                .AllIndices()
+                .AllTypes()
+                .Query(q => q
+                    .Match(m => m
+                        .Field("Source")
+                        .Query(source)
+                    ))
+            );
+
+            Assert.Single(dyndocs.Documents);
+        }
     }
 }
