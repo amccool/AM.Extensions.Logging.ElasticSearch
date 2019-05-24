@@ -22,6 +22,20 @@ Install the package from nuget.org https://www.nuget.org/packages/AM.Extensions.
 Install-Package AM.Extensions.Logging.ElasticSearch
 ```
 
+```
+ .AddLogging(builder =>
+                {
+                    builder
+                        .AddConfiguration(loggingConfiguration.GetSection("Logging"))
+                        .AddElasticSearch(options =>
+                        {
+                            options.ElasticsearchEndpoint = new Uri(@"http://localhost:9200/");
+                            //options.IndexName = "trace";
+                        });
+```
+
+
+
 
 Elasticsearch logging posting using a configurable index prefix
 <your chosen prefix>-YYYY-MM-DD-HH
