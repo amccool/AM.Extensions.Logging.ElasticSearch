@@ -41,6 +41,6 @@ Elasticsearch logging posting using a configurable index prefix
 <your chosen prefix>-YYYY-MM-DD-HH
 the default prefix is "trace"
 
-see <https://github.com/amccool/ElasticSearch.Diagnostics>  for setup of Elasticsearch index via kibana
+see <https://github.com/amccool/AM.Elasticsearch.TraceListener>  for setup of Elasticsearch index via kibana
 
-more to come (PR's welcome)
+PR's welcome
