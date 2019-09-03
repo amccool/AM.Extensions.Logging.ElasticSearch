@@ -241,7 +241,8 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                //this is of questionable value
+                //Debug.WriteLine(ex.Message);
             }
         }
 

@@ -69,6 +69,7 @@ namespace AM.Extensions.Logging.ElasticSearch
 
                     var cc = new ConnectionConfiguration(singleNode,
                             connectionSettings => new ElasticsearchJsonNetSerializer())
+                        .RequestTimeout(TimeSpan.FromSeconds(15))
                         .EnableHttpPipelining()
                         .ThrowExceptions();
 
@@ -140,7 +141,8 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                //eat the exception, we cant really do much with it anyways
+                //Debug.WriteLine(ex.Message);
             }
         }
 
