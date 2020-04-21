@@ -67,11 +67,10 @@ namespace AM.Extensions.Logging.ElasticSearch
                 {
                     var singleNode = new SingleNodeConnectionPool(_endpoint);
 
-                    var cc = new ConnectionConfiguration(singleNode,
-                            connectionSettings => new ElasticsearchJsonNetSerializer())
-                        .RequestTimeout(TimeSpan.FromSeconds(15))
-                        .EnableHttpPipelining()
-                        .ThrowExceptions();
+                    var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
+                    .EnableHttpPipelining()
+                    .EnableHttpCompression()
+                    .ThrowExceptions();
 
                     //the 1.x serializer we needed to use, as the default SimpleJson didnt work right
                     //Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer()
@@ -137,7 +136,10 @@ namespace AM.Extensions.Logging.ElasticSearch
 
             try
             {
-                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
+                //await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
+                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, 
+                    PostData.MultiJson(bbo.ToArray()), 
+                    new BulkRequestParameters { Refresh = Refresh.False });
             }
             catch (Exception ex)
             {
