@@ -26,7 +26,7 @@ jobs:
     - name: Create nupkg
       run: dotnet pack --configuration Release src\ElasticSearch.Extensions.Logging\AM.Extensions.Logging.ElasticSearch.csproj
     - name: Upload nupkg
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2-preview
       with:
         name: nupkg
-        path: AM.Extensions.Logging.ElasticSearch.*.nupkg
+        path: '**/AM.Extensions.Logging.ElasticSearch.*.nupkg'
