@@ -24,4 +24,4 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Create nupkg
-      run: dotnet pack
+      run: dotnet pack --configuration Release
