@@ -3,10 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>AM.Extensions.Logging.ElasticSearch</PackageId>
-    <Version>1.0.3</Version>
-    <PackageVersion>1.0.3</PackageVersion>
-    <PackageVersionPrefix>x</PackageVersionPrefix>
-    <PackageVersionSuffix>x</PackageVersionSuffix>
     <Authors>amccool</Authors>
     <Product>AM.Extensions.Logging.ElasticSearch</Product>
     <Description>Microsoft.Extensions.Logging posting to ElasticSearch</Description>
