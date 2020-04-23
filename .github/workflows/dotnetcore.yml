@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  MAJOR_MINOR_BUILD_VERSION: '1.1.0'
+  MAJOR_MINOR_BUILD_VERSION: '2.0.0'
 
 jobs:
   build:
@@ -50,3 +50,14 @@ jobs:
       with:
         name: nupkg
         path: '**/AM.Extensions.Logging.ElasticSearch.*.nupkg'
+    - name: Create Release
+      if: github.ref == 'refs/heads/master'
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
+        release_name: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
+        draft: true
+        prerelease: true
