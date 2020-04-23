@@ -51,7 +51,7 @@ jobs:
         name: nupkg
         path: '**/AM.Extensions.Logging.ElasticSearch.*.nupkg'
     - name: Create Release
-      if: contains(github.ref, "master")
+      if: github.ref == 'refs/heads/master'
       id: create_release
       uses: actions/create-release@latest
       env:
