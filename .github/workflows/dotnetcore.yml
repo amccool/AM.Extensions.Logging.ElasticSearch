@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  MAJOR_MINOR_BUILD_VERSION: '2.0.0'
+
 jobs:
   build:
 
@@ -18,17 +21,20 @@ jobs:
       with:
         dotnet-version: 2.1.202
 
-    - name: GitVersion
-      id: gitversion  # step id used as reference for output values
-      uses: roryprimrose/rungitversion@v1
+    - name: Output Run ID
+      run: echo ${{ github.run_id }}
+    - name: Output Run Number
+      run: echo ${{ github.run_number }}
+    - name: show full version number
+      run: echo ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
 
     - name: Update project version
       uses: roryprimrose/set-vs-sdk-project-version@v1.0.3
       with:
-        version: ${{ steps.gitversion.outputs.NuGetVersionV2 }}
-        assemblyVersion: ${{ steps.gitversion.outputs.AssemblySemVer }}
-        fileVersion: ${{ steps.gitversion.outputs.MajorMinorPatch }}
-        informationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}        
+        version: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
+        assemblyVersion: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
+        fileVersion: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
+        informationalVersion: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
 
     - name: Install dependencies
       run: dotnet restore
