@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Elasticsearch.Net;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -72,9 +76,9 @@ namespace AM.Extensions.Logging.ElasticSearch
             return logLevel != LogLevel.None && logLevel >= _logLevel;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, 
-            TState state, 
-            Exception exception, 
+        public void Log<TState>(LogLevel logLevel, EventId eventId,
+            TState state,
+            Exception exception,
             Func<TState, Exception, string> formatter)
         {
             if (!IsEnabled(logLevel))
@@ -93,7 +97,7 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
 
             var message = formatter(state, exception);
-            
+
             WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
         }
 
@@ -114,7 +118,7 @@ namespace AM.Extensions.Logging.ElasticSearch
                 {
                     updatedMessage = ((Exception)data).Message;
 
-                    
+
                     payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
                 }
                 else if (data is XPathNavigator)

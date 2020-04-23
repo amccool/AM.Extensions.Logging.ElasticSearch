@@ -1,10 +1,11 @@
-﻿using System.IO;
 using System.Reflection;
+using Elasticsearch.Net;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
-using Newtonsoft.Json;
 
 namespace AM.Extensions.Logging.ElasticSearch
 {
@@ -15,7 +16,7 @@ namespace AM.Extensions.Logging.ElasticSearch
         /// <summary>
         /// The size of the buffer to use when writing the serialized request
         /// to the request stream
-        /// Performance tests as part of https://github.com/elastic/elasticsearch-net/issues/1899 indicate this 
+        /// Performance tests as part of https://github.com/elastic/elasticsearch-net/issues/1899 indicate this
         /// to be a good compromise buffer size for performance throughput and bytes allocated.
         /// </summary>
         protected virtual int BufferSize => 1024;
@@ -40,31 +41,41 @@ namespace AM.Extensions.Logging.ElasticSearch
             return settings;
         }
 
+        public object Deserialize(Type type, Stream stream)
+        {
+            var settings = this._settings;
+            return _Deserialize(type, stream, settings);
+        }
 
         public T Deserialize<T>(Stream stream)
         {
             var settings = this._settings;
-            return _Deserialize<T>(stream, settings);
+            return (T)_Deserialize(typeof(T), stream, settings);
         }
 
-        public async Task<T> DeserializeAsync<T>(Stream responseStream, CancellationToken cancellationToken = new CancellationToken())
+        public Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.Deserialize<T>(responseStream);
+            return Task.FromResult(_Deserialize(type, stream));
         }
 
-        protected internal T _Deserialize<T>(Stream stream, JsonSerializerSettings settings = null)
+        protected internal object _Deserialize(Type type, Stream stream, JsonSerializerSettings settings = null)
         {
             settings = settings ?? this._settings;
             var serializer = JsonSerializer.Create(settings);
             var jsonTextReader = new JsonTextReader(new StreamReader(stream));
-            var t = (T) serializer.Deserialize(jsonTextReader, typeof(T));
+            var t = serializer.Deserialize(jsonTextReader, type);
             return t;
         }
 
-
-        public void Serialize(object data, Stream writableStream, SerializationFormatting formatting = SerializationFormatting.Indented)
+        public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default(CancellationToken))
         {
-            using (var writer = new StreamWriter(writableStream, ExpectedEncoding, BufferSize, leaveOpen: true))
+            var result = this.Deserialize<T>(stream);
+            return Task.FromResult(result);
+        }
+
+        public void Serialize<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.Indented)
+        {
+            using (var writer = new StreamWriter(stream, ExpectedEncoding, BufferSize, leaveOpen: true))
             using (var jsonWriter = new JsonTextWriter(writer))
             {
                 _defaultSerializer.Serialize(jsonWriter, data);
@@ -73,6 +84,10 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
         }
 
-        public IPropertyMapping CreatePropertyMapping(MemberInfo memberInfo) => null;
+        public Task SerializeAsync<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.Indented, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Serialize(data, stream, formatting);
+            return Task.CompletedTask;
+        }
     }
 }

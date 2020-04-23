@@ -1,24 +1,9 @@
-using System;
-using System.Diagnostics;
 using System.IO;
-using System.Net;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using AM.Extensions.Logging.ElasticSearch;
-using Elasticsearch.Net;
-using ElasticsearchInside;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Nest;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ElasticLogger.Test
 {
