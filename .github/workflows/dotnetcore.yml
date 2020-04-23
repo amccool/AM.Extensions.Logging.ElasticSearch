@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  MAJOR_MINOR_BUILD_VERSION: '2.0.0'
+  MAJOR_MINOR_BUILD_VERSION: '1.1.0'
 
 jobs:
   build:
