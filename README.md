@@ -1,10 +1,7 @@
 # AM.Extensions.Logging.ElasticSearch
 Microsoft.Extensions.Logging compatible logger posting to ElasticSearch
 
-[![Build status](https://ci.appveyor.com/api/projects/status/4xbcyrkxq39vwt5l?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-extensions-logging)
-
-
-[![Build status](https://ci.appveyor.com/api/projects/status/4xbcyrkxq39vwt5l/branch/master?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-extensions-logging/branch/master)
+![.NET Core](https://github.com/amccool/AM.Extensions.Logging.ElasticSearch/workflows/.NET%20Core/badge.svg?branch=master)  - master
 
 
 ElasticSearch Logger is a ILogger based logger which submits events and data to ElasticSearch making them viewable with Kibana
