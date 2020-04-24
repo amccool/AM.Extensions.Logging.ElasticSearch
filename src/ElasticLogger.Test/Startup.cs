@@ -28,7 +28,8 @@ namespace ElasticLogger.Test
                 await next.Invoke();
             });
 
-            app.UseMvcWithDefaultRoute();
+            //app.UseMvcWithDefaultRoute();
+            //app.useco .AddControllers
         }
     }
 }
