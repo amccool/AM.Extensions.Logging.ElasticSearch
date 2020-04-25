@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  MAJOR_MINOR_BUILD_VERSION: '2.0.0'
+  MAJOR_MINOR_BUILD_VERSION: '6.8.0'
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1.4.0
       with:
-        dotnet-version: 2.1.202
+        dotnet-version: 3.1.201
 
     - name: Output Run ID
       run: echo ${{ github.run_id }}
