@@ -18,10 +18,10 @@ namespace AM.Extensions.Logging.ElasticSearch
     {
         #region fields
         private IElasticLowLevelClient _client;
-        private readonly Uri _endpoint;
-        private readonly string _indexPrefix;
+        // private readonly Uri _endpoint;
+        // private readonly string _indexPrefix;
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
-
+        private readonly IOptionsMonitor<ElasticsearchLoggerOptions> _optionsMonitor;
         private const string DocumentType = "doc";
         private Action<JObject> _scribeProcessor;
 
@@ -32,21 +32,30 @@ namespace AM.Extensions.Logging.ElasticSearch
         /// <summary>
         /// prefix for the Index for traces
         /// </summary>
-        private string Index => this._indexPrefix.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
+        private string Index => _optionsMonitor.CurrentValue.IndexName.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
 
 
-        public ElasticsearchLoggerProvider(IOptions<ElasticsearchLoggerOptions> options) : this(options.Value)
-        { }
+        public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> optionsMonitor)
+        {
+            _optionsMonitor = optionsMonitor;
+
+            _optionsMonitor.OnChange(UpdateClientWithNewOptions);
+
+            Initialize();
+        }
+
+        private void UpdateClientWithNewOptions(ElasticsearchLoggerOptions newOptions)
+        {
+            var newClient = CreateNewElasticLowLevelClient(newOptions.ElasticsearchEndpoint);
+
+            _client = newClient;
+        }
 
         public ElasticsearchLoggerProvider(ElasticsearchLoggerOptions options)
         {
-            _endpoint = options.ElasticsearchEndpoint;
-            _indexPrefix = options.IndexName;
-
             //build the client
             //build the batcher
             Initialize();
-
         }
 
         public ILogger CreateLogger(string categoryName)
@@ -65,20 +74,23 @@ namespace AM.Extensions.Logging.ElasticSearch
                 }
                 else
                 {
-                    var singleNode = new SingleNodeConnectionPool(_endpoint);
+                    this._client = CreateNewElasticLowLevelClient(_optionsMonitor.CurrentValue.ElasticsearchEndpoint);
 
-                    var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
-                    .EnableHttpPipelining()
-                    .EnableHttpCompression()
-                    .ThrowExceptions();
-
-                    //the 1.x serializer we needed to use, as the default SimpleJson didnt work right
-                    //Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer()
-
-                    this._client = new ElasticLowLevelClient(cc);
                     return this._client;
                 }
             }
+        }
+
+        private ElasticLowLevelClient CreateNewElasticLowLevelClient(Uri elasticSearchEndpoint)
+        {
+            var singleNode = new SingleNodeConnectionPool(_optionsMonitor.CurrentValue.ElasticsearchEndpoint);
+
+            var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
+            .EnableHttpPipelining()
+            .EnableHttpCompression()
+            .ThrowExceptions();
+
+            return new ElasticLowLevelClient(cc);
         }
 
         private void Initialize()
