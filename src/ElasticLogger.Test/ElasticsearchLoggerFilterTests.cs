@@ -258,9 +258,26 @@ namespace ElasticLogger.Test
         {
             await _fixture.ReadyAsync();
 
-            ILoggerFactory loggerFactory = new LoggerFactory()
-                .AddElasticSearch(_fixture.Endpoint);
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                                    {"Logging:LogLevel:Default", logLevel.ToString() }
+                    }
+                })
+                .Build();
 
+            //di for the logger
+            ServiceCollection services = new ServiceCollection();
+            services.AddLogging(l =>
+            {
+                l.AddConfiguration(config.GetSection("Logging"));
+                l.AddElasticSearch(o => o.ElasticsearchEndpoint = _fixture.Endpoint);
+            });
+            var prov = services.BuildServiceProvider();
+
+            var loggerFactory = prov.GetService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger(source);
 
             var circularRefObj = new Circle();
@@ -290,8 +307,26 @@ namespace ElasticLogger.Test
         {
             await _fixture.ReadyAsync();
 
-            ILoggerFactory loggerFactory = new LoggerFactory()
-                .AddElasticSearch(_fixture.Endpoint);
+            var config = new ConfigurationBuilder()
+                .Add(new MemoryConfigurationSource
+                {
+                    InitialData = new Dictionary<string, string>
+                    {
+                                    {"Logging:LogLevel:Default", logLevel.ToString() }
+                    }
+                })
+                .Build();
+
+            //di for the logger
+            ServiceCollection services = new ServiceCollection();
+            services.AddLogging(l =>
+            {
+                l.AddConfiguration(config.GetSection("Logging"));
+                l.AddElasticSearch(o => o.ElasticsearchEndpoint = _fixture.Endpoint);
+            });
+            var prov = services.BuildServiceProvider();
+
+            var loggerFactory = prov.GetService<ILoggerFactory>();
 
             var logger = loggerFactory.CreateLogger(source);
 

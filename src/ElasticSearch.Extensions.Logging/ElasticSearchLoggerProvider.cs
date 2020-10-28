@@ -17,17 +17,14 @@ namespace AM.Extensions.Logging.ElasticSearch
     public class ElasticsearchLoggerProvider : ILoggerProvider
     {
         #region fields
-        private IElasticLowLevelClient _client;
+        private readonly IOptionsMonitor<ElasticsearchLoggerOptions> _optionsMonitor;
         // private readonly Uri _endpoint;
         // private readonly string _indexPrefix;
+        private IElasticLowLevelClient _client;
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
-        private readonly IOptionsMonitor<ElasticsearchLoggerOptions> _optionsMonitor;
         private const string DocumentType = "doc";
         private Action<JObject> _scribeProcessor;
-
         #endregion
-
-
 
         /// <summary>
         /// prefix for the Index for traces
@@ -37,6 +34,10 @@ namespace AM.Extensions.Logging.ElasticSearch
 
         public ElasticsearchLoggerProvider(IOptionsMonitor<ElasticsearchLoggerOptions> optionsMonitor)
         {
+            if(optionsMonitor == null)
+            {
+                throw new ArgumentNullException(nameof(optionsMonitor));
+            }
             _optionsMonitor = optionsMonitor;
 
             _optionsMonitor.OnChange(UpdateClientWithNewOptions);
