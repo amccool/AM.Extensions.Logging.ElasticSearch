@@ -257,9 +257,26 @@ namespace ElasticLogger.Test
         private async Task LevelTesterPositive(string source, LogLevel logLevel)
         {
             await _fixture.ReadyAsync();
+            var config = new ConfigurationBuilder()
+            .Add(new MemoryConfigurationSource
+            {
+                InitialData = new Dictionary<string, string>
+                {
+                    {"Logging:LogLevel:Default", logLevel.ToString() }
+                }
+            })
+            .Build();
 
-            ILoggerFactory loggerFactory = new LoggerFactory()
-                .AddElasticSearch(_fixture.Endpoint);
+            //di for the logger
+            ServiceCollection services = new ServiceCollection();
+            services.AddLogging(l =>
+            {
+                l.AddConfiguration(config.GetSection("Logging"));
+                l.AddElasticSearch(o => o.ElasticsearchEndpoint = _fixture.Endpoint);
+            });
+            var prov = services.BuildServiceProvider();
+
+            var loggerFactory = prov.GetService<ILoggerFactory>();
 
             var logger = loggerFactory.CreateLogger(source);
 
@@ -290,8 +307,26 @@ namespace ElasticLogger.Test
         {
             await _fixture.ReadyAsync();
 
-            ILoggerFactory loggerFactory = new LoggerFactory()
-                .AddElasticSearch(_fixture.Endpoint);
+            var config = new ConfigurationBuilder()
+            .Add(new MemoryConfigurationSource
+            {
+                InitialData = new Dictionary<string, string>
+                {
+                    {"Logging:LogLevel:Default", logLevel.ToString() }
+                }
+            })
+            .Build();
+
+            //di for the logger
+            ServiceCollection services = new ServiceCollection();
+            services.AddLogging(l =>
+            {
+                l.AddConfiguration(config.GetSection("Logging"));
+                l.AddElasticSearch(o => o.ElasticsearchEndpoint = _fixture.Endpoint);
+            });
+            var prov = services.BuildServiceProvider();
+
+            var loggerFactory = prov.GetService<ILoggerFactory>();
 
             var logger = loggerFactory.CreateLogger(source);
 
