@@ -61,6 +61,26 @@ jobs:
         release_name: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
         draft: true
         prerelease: true
+    - name: Upload
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const path = require('path');
+          const fs = require('fs');
+          const release_id = '${{ needs.create_release.outputs.id }}';
+          for (let file of await fs.readdirSync('./')) {
+            if (path.extname(file) === '.nupkg') {
+              console.log('uploadReleaseAsset', file);
+              await github.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release_id,
+                name: file,
+                data: await fs.readFileSync(`./${file}`)
+              });
+            }
+          }
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
