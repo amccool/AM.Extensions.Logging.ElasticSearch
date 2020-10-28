@@ -86,7 +86,7 @@ namespace ElasticLogger.Test
 
 
         [Fact]
-        public async Task configured_categories_dont_log_for_config()
+        public async Task Configured_categories_dont_log_for_config()
         {
             var source = "Billy.bob";
 

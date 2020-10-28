@@ -16,13 +16,9 @@ namespace ElasticLogger.Test
             _output = outputHelper;
         }
 
-
-
         [Fact]
         public async Task TryingToBreakThisThing()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings { };
-
             Circle sillyCircle = new Circle{me = null};
             sillyCircle.me = sillyCircle;
 
@@ -34,7 +30,7 @@ namespace ElasticLogger.Test
 
             var reader = new StreamReader(stream);
 
-            var huh = await reader.ReadToEndAsync();
+            await reader.ReadToEndAsync();
         }
 
         [Fact(Skip ="issues with hosting")]

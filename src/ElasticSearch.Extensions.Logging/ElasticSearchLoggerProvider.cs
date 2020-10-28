@@ -18,8 +18,6 @@ namespace AM.Extensions.Logging.ElasticSearch
     {
         #region fields
         private readonly IOptionsMonitor<ElasticsearchLoggerOptions> _optionsMonitor;
-        // private readonly Uri _endpoint;
-        // private readonly string _indexPrefix;
         private IElasticLowLevelClient _client;
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
         private const string DocumentType = "doc";
@@ -52,18 +50,10 @@ namespace AM.Extensions.Logging.ElasticSearch
             _client = newClient;
         }
 
-        public ElasticsearchLoggerProvider(ElasticsearchLoggerOptions options)
-        {
-            //build the client
-            //build the batcher
-            Initialize();
-        }
-
         public ILogger CreateLogger(string categoryName)
         {
             return new ElasticsearchLogger(categoryName, _scribeProcessor);
         }
-
 
         public IElasticLowLevelClient Client
         {
@@ -154,7 +144,7 @@ namespace AM.Extensions.Logging.ElasticSearch
                     PostData.MultiJson(bbo.ToArray()), 
                     new BulkRequestParameters { Refresh = Refresh.False });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //eat the exception, we cant really do much with it anyways
                 //Debug.WriteLine(ex.Message);
@@ -165,21 +155,6 @@ namespace AM.Extensions.Logging.ElasticSearch
         {
             this._queueToBePosted.Add(jo);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
