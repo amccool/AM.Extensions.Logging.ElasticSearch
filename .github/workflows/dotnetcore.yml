@@ -66,6 +66,7 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
+          console.log('environment', process.versions);
           const path = require('path');
           const fs = require('fs');
           const release_id = '${{ needs.create_release.outputs.id }}';
