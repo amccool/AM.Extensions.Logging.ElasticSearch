@@ -17,9 +17,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1.4.0
+      uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.201
+        dotnet-version: '3.1.x'
 
     - name: Output Run ID
       run: echo ${{ github.run_id }}
@@ -61,3 +61,34 @@ jobs:
         release_name: ${{ env.MAJOR_MINOR_BUILD_VERSION }}.${{ github.run_number }}
         draft: true
         prerelease: true
+    # - name: Upload
+    #   uses: actions/github-script@v3
+    #   with:
+    #     github-token: ${{secrets.GITHUB_TOKEN}}
+    #     script: |
+    #       console.log('environment', process.versions);
+    #       const path = require('path');
+    #       const fs = require('fs');
+    #       const release_id = '${{ needs.create_release.outputs.id }}';
+    #       for (let file of await fs.readdirSync('./')) {
+    #         if (path.extname(file) === '.nupkg') {
+    #           console.log('uploadReleaseAsset', file);
+    #           await github.repos.uploadReleaseAsset({
+    #             owner: context.repo.owner,
+    #             repo: context.repo.repo,
+    #             release_id: release_id,
+    #             name: file,
+    #             data: await fs.readFileSync(`./${file}`)
+    #           });
+    #         }
+    #       }
+    # - name: Upload Release Asset
+    #   id: upload-release-asset 
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+    #     asset_path: '**/AM.Extensions.Logging.ElasticSearch.*.nupkg'
+    #     asset_name: nupkg
+    #     asset_content_type: application/zip
