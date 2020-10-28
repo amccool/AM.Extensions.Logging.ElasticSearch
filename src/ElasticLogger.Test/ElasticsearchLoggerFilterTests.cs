@@ -257,16 +257,15 @@ namespace ElasticLogger.Test
         private async Task LevelTesterPositive(string source, LogLevel logLevel)
         {
             await _fixture.ReadyAsync();
-
             var config = new ConfigurationBuilder()
-                .Add(new MemoryConfigurationSource
+            .Add(new MemoryConfigurationSource
+            {
+                InitialData = new Dictionary<string, string>
                 {
-                    InitialData = new Dictionary<string, string>
-                    {
-                                    {"Logging:LogLevel:Default", logLevel.ToString() }
-                    }
-                })
-                .Build();
+                    {"Logging:LogLevel:Default", logLevel.ToString() }
+                }
+            })
+            .Build();
 
             //di for the logger
             ServiceCollection services = new ServiceCollection();
@@ -308,14 +307,14 @@ namespace ElasticLogger.Test
             await _fixture.ReadyAsync();
 
             var config = new ConfigurationBuilder()
-                .Add(new MemoryConfigurationSource
+            .Add(new MemoryConfigurationSource
+            {
+                InitialData = new Dictionary<string, string>
                 {
-                    InitialData = new Dictionary<string, string>
-                    {
-                                    {"Logging:LogLevel:Default", logLevel.ToString() }
-                    }
-                })
-                .Build();
+                    {"Logging:LogLevel:Default", logLevel.ToString() }
+                }
+            })
+            .Build();
 
             //di for the logger
             ServiceCollection services = new ServiceCollection();
