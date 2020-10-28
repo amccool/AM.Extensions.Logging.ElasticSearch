@@ -86,7 +86,7 @@ namespace ElasticLogger.Test
 
 
         [Fact]
-        public async Task configured_categories_dont_log_for_config()
+        public async Task Configured_categories_dont_log_for_config()
         {
             var source = "Billy.bob";
 
@@ -277,7 +277,6 @@ namespace ElasticLogger.Test
             var prov = services.BuildServiceProvider();
 
             var loggerFactory = prov.GetService<ILoggerFactory>();
-
             var logger = loggerFactory.CreateLogger(source);
 
             var circularRefObj = new Circle();

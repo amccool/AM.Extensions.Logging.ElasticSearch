@@ -20,7 +20,8 @@ namespace ElasticLogger.Test
 
             _elasticsearch = new ElasticsearchInside.Elasticsearch(c => c.SetElasticsearchStartTimeout(60)
                 .EnableLogging()
-                .LogTo(s => _messageSink.OnMessage(new Xunit.Sdk.DiagnosticMessage(s ?? string.Empty))));
+                .LogTo(s => _messageSink.OnMessage(new Xunit.Sdk.DiagnosticMessage(s ?? string.Empty)))
+                );
 
             _elasticsearch.ReadySync();
         }

@@ -107,7 +107,6 @@ namespace AM.Extensions.Logging.ElasticSearch
                 {
                     updatedMessage = ((Exception)data).Message;
 
-
                     payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
                 }
                 else if (data is XPathNavigator)
@@ -232,15 +231,11 @@ namespace AM.Extensions.Logging.ElasticSearch
 
                 _scribeProcessor(jo);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //this is of questionable value
                 //Debug.WriteLine(ex.Message);
             }
         }
-
-
-
-
     }
 }
