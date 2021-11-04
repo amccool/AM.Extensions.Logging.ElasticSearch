@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
@@ -77,6 +78,7 @@ namespace AM.Extensions.Logging.ElasticSearch
             var singleNode = new SingleNodeConnectionPool(_optionsMonitor.CurrentValue.ElasticsearchEndpoint);
 
             var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
+                //.ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true)
             .EnableHttpPipelining()
             .EnableHttpCompression()
             .ThrowExceptions();
@@ -137,18 +139,20 @@ namespace AM.Extensions.Logging.ElasticSearch
             var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
             var bbo = bb.SelectMany(a => a);
 
-            try
-            {
-                //await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
-                await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, 
-                    PostData.MultiJson(bbo.ToArray()), 
-                    new BulkRequestParameters { Refresh = Refresh.False });
-            }
-            catch (Exception)
-            {
-                //eat the exception, we cant really do much with it anyways
-                //Debug.WriteLine(ex.Message);
-            }
+            _ = Client.BulkPutAsync<VoidResponse>(Index, DocumentType,
+                PostData.MultiJson(bbo.ToArray()),
+                new BulkRequestParameters { Refresh = Refresh.False })
+                .ContinueWith(x =>
+                {
+                    if (x.IsFaulted)
+                    {
+                        Debug.WriteLine(x.Exception);
+                    }
+                },
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Current);
+
         }
 
         private void WriteToQueueForProcessing(JObject jo)
