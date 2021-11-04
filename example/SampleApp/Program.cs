@@ -39,7 +39,9 @@ namespace SampleApp
                         .AddEventSourceLogger()
                         .AddElasticSearch(options =>
                         {
-                            options.ElasticsearchEndpoint = new Uri(@"http://localhost:9200/");
+                            //options.ElasticsearchEndpoint = new Uri(@"http://localhost:9200/");
+                            //options.ElasticsearchEndpoint = new Uri(@"https://elasticsearch.mgmc.rauland/");
+                            options.ElasticsearchEndpoint = new Uri(@"http://es.devint.dev-r5ead.net:9200/");
                             //options.IndexName = "trace";
                         });
                 });
