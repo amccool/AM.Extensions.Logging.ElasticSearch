@@ -78,7 +78,7 @@ namespace AM.Extensions.Logging.ElasticSearch
             var singleNode = new SingleNodeConnectionPool(_optionsMonitor.CurrentValue.ElasticsearchEndpoint);
 
             var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
-                //.ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true)
+                .ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true)
             .EnableHttpPipelining()
             .EnableHttpCompression()
             .ThrowExceptions();
@@ -88,7 +88,7 @@ namespace AM.Extensions.Logging.ElasticSearch
 
         private void Initialize()
         {
-            //setup a flag in config to chose
+            //TODO: setup a flag in config to chose
             //SetupObserver();
             SetupObserverBatchy();
         }
@@ -96,7 +96,7 @@ namespace AM.Extensions.Logging.ElasticSearch
 
         private void SetupObserver()
         {
-            _scribeProcessor = a => WriteDirectlyToES(a);
+            _scribeProcessor = async (a) => await WriteDirectlyToES(a);
 
             //this._queueToBePosted.GetConsumingEnumerable()
             //.ToObservable(Scheduler.Default)
@@ -128,6 +128,9 @@ namespace AM.Extensions.Logging.ElasticSearch
             }
         }
 
+        //POST /_bulk? filter_path = items.*.error
+        private static Dictionary<string, object> filter_path = new Dictionary<string, object>() { { "filter_path", "items.*.error" } };
+
         private async Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
         {
             if (!jos.Any())
@@ -141,7 +144,7 @@ namespace AM.Extensions.Logging.ElasticSearch
 
             _ = Client.BulkPutAsync<VoidResponse>(Index, DocumentType,
                 PostData.MultiJson(bbo.ToArray()),
-                new BulkRequestParameters { Refresh = Refresh.False })
+                new BulkRequestParameters { Refresh = Refresh.False,  QueryString=filter_path })
                 .ContinueWith(x =>
                 {
                     if (x.IsFaulted)
