@@ -131,10 +131,10 @@ namespace AM.Extensions.Logging.ElasticSearch
         //POST /_bulk? filter_path = items.*.error
         private static Dictionary<string, object> filter_path = new Dictionary<string, object>() { { "filter_path", "items.*.error" } };
 
-        private async Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
+        private Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
         {
             if (!jos.Any())
-                return;
+                return Task.CompletedTask;
 
             var indx = new { index = new { _index = Index, _type = DocumentType } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
@@ -156,11 +156,12 @@ namespace AM.Extensions.Logging.ElasticSearch
                 TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
                 TaskScheduler.Current);
 
+            return Task.CompletedTask;
         }
 
         private void WriteToQueueForProcessing(JObject jo)
         {
-            this._queueToBePosted.Add(jo);
+            _queueToBePosted.Add(jo);
         }
 
         #region IDisposable Support
@@ -173,6 +174,8 @@ namespace AM.Extensions.Logging.ElasticSearch
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
+                    //_client.
+                    _queueToBePosted.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
