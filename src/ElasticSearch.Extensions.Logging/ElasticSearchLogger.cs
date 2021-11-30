@@ -12,9 +12,8 @@ using System.Xml.XPath;
 
 namespace AM.Extensions.Logging.ElasticSearch
 {
-    public class ElasticsearchLogger : ILogger
+    internal sealed class ElasticsearchLogger : ILogger
     {
-
         private readonly LogLevel _logLevel;
         private readonly string _userDomainName;
         private readonly string _userName;
@@ -32,27 +31,9 @@ namespace AM.Extensions.Logging.ElasticSearch
             _userDomainName = Environment.UserDomainName;
             _userName = Environment.UserName;
             _machineName = Environment.MachineName;
-
         }
 
-        //public ElasticsearchLogger(string categoryName, Uri endpoint, string indexPrefix)
-        //{
-        //    Name = categoryName;
-            
-        //    _endpoint = endpoint;
-        //    _indexPrefix = indexPrefix;
-
-        //    // Default is to turn on all the logging
-        //    _logLevel = LogLevel.Trace;
-
-        //    _userDomainName = Environment.UserDomainName;
-        //    _userName = Environment.UserName;
-        //    _machineName = Environment.MachineName;
-        //    Initialize();
-        //}
-
         public string Name { get; }
-        
 
 
         public IDisposable BeginScope<TState>(TState state)
@@ -90,80 +71,22 @@ namespace AM.Extensions.Logging.ElasticSearch
             WriteTrace(Name, logLevel, eventId.Id, message, Guid.Empty, exception);
         }
 
-        protected void WriteTrace(
+        private void WriteTrace(
             string loggerName,
             LogLevel eventType,
             int id,
             string message,
             Guid? relatedActivityId,
-            object data)
+            Exception data)
         {
-            string updatedMessage = message;
             JObject payload = null;
             var serializerIgnoreReferenceLoop = new JsonSerializer { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
             if (data != null)
             {
-                if (data is Exception)
-                {
-                    updatedMessage = ((Exception)data).Message;
-
-                    payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
-                }
-                else if (data is XPathNavigator)
-                {
-                    var xdata = data as XPathNavigator;
-                    //xdata.MoveToRoot();
-
-                    XDocument xmlDoc;
-                    try
-                    {
-                        xmlDoc = XDocument.Parse(xdata.OuterXml);
-
-                    }
-                    catch (Exception)
-                    {
-                        xmlDoc = XDocument.Parse(xdata.ToString());
-                        //eat
-                        //throw;
-                    }
-
-                    // Convert the XML document in to a dynamic C# object.
-                    dynamic xmlContent = new ExpandoObject();
-                    ExpandoObjectHelper.Parse(xmlContent, xmlDoc.Root);
-
-                    string json = JsonConvert.SerializeObject(xmlContent, new JsonSerializerSettings{ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
-                    payload = JObject.Parse(json);
-                }
-                else if (data is DateTime)
-                {
-                    payload = new JObject();
-                    payload.Add("System.DateTime", (DateTime)data);
-                }
-                else if (data is string)
-                {
-                    payload = new JObject();
-                    payload.Add("string", (string)data);
-                }
-                else if (data.GetType().IsValueType)
-                {
-                    payload = new JObject { { "data", data.ToString() } };
-                }
-                else
-                {
-                    try
-                    {
-                        payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
-                    }
-                    catch (JsonSerializationException jEx)
-                    {
-                        payload = new JObject();
-                        payload.Add("FAILURE", jEx.Message);
-                        payload.Add("data", data.GetType().ToString());
-                    }
-                }
+                payload = JObject.FromObject(data, serializerIgnoreReferenceLoop);
             }
 
-            InternalWrite(new TraceEventCache(), loggerName, eventType, id, updatedMessage, relatedActivityId, payload);
+            InternalWrite(new TraceEventCache(), loggerName, eventType, id, message, relatedActivityId, payload);
         }
 
         private void InternalWrite(
@@ -172,8 +95,7 @@ namespace AM.Extensions.Logging.ElasticSearch
                     LogLevel eventType,
                     int? traceId,
                     string message,
-                    Guid?
-                    relatedActivityId,
+                    Guid? relatedActivityId,
                     JObject dataObject)
         {
             DateTime logTime;

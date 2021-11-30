@@ -40,9 +40,7 @@ namespace SampleApp
                         .AddElasticSearch(options =>
                         {
                             //options.ElasticsearchEndpoint = new Uri(@"http://localhost:9200/");
-                            //options.ElasticsearchEndpoint = new Uri(@"https://elasticsearch.mgmc.rauland/");
                             options.ElasticsearchEndpoint = new Uri(@"http://es.devint.dev-r5ead.net:9200/");
-                            //options.IndexName = "trace";
                         });
                 });
 
@@ -77,6 +75,17 @@ namespace SampleApp
             logger.LogInformation("Starting application");
             logger.LogTrace("Starting application");
             logger.LogWarning("Starting application");
+
+            try
+            {
+                int x = 0;
+                var y = 100 / x;
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(new EventId(10, "cccc"), ex, "blah blah {junk}", 19999999);
+                //throw;
+            }
 
 
             //do the actual work here

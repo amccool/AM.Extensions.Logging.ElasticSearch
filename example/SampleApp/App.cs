@@ -52,10 +52,10 @@ namespace SampleApp
                 _logger.LogWarning("Run...................");
             }
 
-            _logger.LogInformation($"Ending Service for  with LogKey {logKey}");
+            _logger.LogInformation("Ending Service for  with LogKey {logKey}", logKey);
         }
 
-        private async Task Breakstuff()
+        private Task Breakstuff()
         {
             int x = 0;
             try
@@ -64,8 +64,9 @@ namespace SampleApp
             }
             catch (Exception e)
             {
-                _logger.LogError(100, e, "sdgsgsgsg", 1, "3");
+                _logger.LogError(100, e, "sdgsgsgsg {a} {b}", 1, "sdfsdgfsg");
             }
+            return Task.CompletedTask;
         }
     }
 }
