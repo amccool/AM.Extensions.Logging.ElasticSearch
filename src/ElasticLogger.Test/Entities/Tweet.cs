@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ElasticLogger.Test
+namespace ElasticLogger.Test.Entities
 {
     internal class Tweet : IEquatable<Tweet>
     {
@@ -15,8 +15,8 @@ namespace ElasticLogger.Test
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Tweet) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Tweet)obj);
         }
 
         public override int GetHashCode()
@@ -24,9 +24,9 @@ namespace ElasticLogger.Test
             unchecked
             {
                 var hashCode = Id;
-                hashCode = (hashCode * 397) ^ (User != null ? User.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ PostDate.GetHashCode();
-                hashCode = (hashCode * 397) ^ (Message != null ? Message.GetHashCode() : 0);
+                hashCode = hashCode * 397 ^ (User != null ? User.GetHashCode() : 0);
+                hashCode = hashCode * 397 ^ PostDate.GetHashCode();
+                hashCode = hashCode * 397 ^ (Message != null ? Message.GetHashCode() : 0);
                 return hashCode;
             }
         }

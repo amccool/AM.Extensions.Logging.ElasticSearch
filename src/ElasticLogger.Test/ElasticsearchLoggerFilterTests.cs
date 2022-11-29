@@ -1,4 +1,4 @@
-﻿ using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using AM.Extensions.Logging.ElasticSearch;
@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Nest;
 using Xunit.Abstractions;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using ElasticLogger.Test.Entities;
 
 namespace ElasticLogger.Test
 {

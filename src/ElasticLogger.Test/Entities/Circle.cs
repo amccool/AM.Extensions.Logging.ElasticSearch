@@ -1,4 +1,4 @@
-namespace ElasticLogger.Test
+namespace ElasticLogger.Test.Entities
 {
     public class Circle
     {

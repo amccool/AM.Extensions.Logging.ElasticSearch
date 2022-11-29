@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using AM.Extensions.Logging.ElasticSearch;
+using ElasticLogger.Test.Entities;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
