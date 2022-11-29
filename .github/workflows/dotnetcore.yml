@@ -17,9 +17,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '3.1.x'
+        dotnet-version: '6.0.x'
 
     - name: Output Run ID
       run: echo ${{ github.run_id }}
