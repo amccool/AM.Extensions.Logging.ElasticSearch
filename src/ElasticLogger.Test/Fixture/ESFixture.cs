@@ -1,62 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace ElasticLogger.Test.Fixture
 {
-    internal class ESFixture
+    public class ESFixture : IAsyncLifetime, IDisposable
     {
-    }
+        //private ITestOutputHelper _output;
+        private readonly ElasticsearchInside.Elasticsearch _elasticsearch;
 
-    namespace DotNet.Testcontainers.Tests.Fixtures
-    {
-        using System;
-        using System.Threading.Tasks;
-        using DotNet.Testcontainers.Builders;
-        using DotNet.Testcontainers.Configurations;
-        using DotNet.Testcontainers.Containers;
-        using Elastic.Clients.Elasticsearch;
-        using Elastic.Transport;
-        using Elasticsearch.Net;
-        using global::DotNet.Testcontainers.Builders;
-        using global::DotNet.Testcontainers.Configurations;
-        using global::DotNet.Testcontainers.Containers;
-        using JetBrains.Annotations;
+        public Uri Endpoint => _elasticsearch.Url;
 
-        [UsedImplicitly]
-        public sealed class ElasticsearchFixture : DatabaseFixture<ElasticsearchTestcontainer, ElasticsearchClient>
+        private readonly IMessageSink _messageSink;
+
+        public ESFixture(IMessageSink messageSink)
         {
-            private readonly TestcontainerDatabaseConfiguration configuration = new ElasticsearchTestcontainerConfiguration { Password = "secret" };
+            _messageSink = messageSink;
 
-            public ElasticsearchFixture()
-            {
-                this.Container = new TestcontainersBuilder<ElasticsearchTestcontainer>()
-                  .WithDatabase(this.configuration)
-                  .Build();
-            }
+            _elasticsearch = new ElasticsearchInside.Elasticsearch(c => c.SetElasticsearchStartTimeout(60)
+                .EnableLogging()
+                .LogTo(s => _messageSink.OnMessage(new Xunit.Sdk.DiagnosticMessage(s ?? string.Empty)))
+                );
 
-            public override async Task InitializeAsync()
-            {
-                await this.Container.StartAsync()
-                  .ConfigureAwait(false);
+            _elasticsearch.ReadySync();
+        }
 
-                var settings = new ElasticsearchClientSettings(new Uri(this.Container.ConnectionString))
-                  .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-                  .Authentication(new BasicAuthentication(this.Container.Username, this.Container.Password));
+        public Task<ElasticsearchInside.Elasticsearch> ReadyAsync()
+        {
+            return _elasticsearch.Ready();
+        }
 
-                this.Connection = new ElasticsearchClient(settings);
-            }
+        public void Dispose()
+        {
+            //uber importadante !
+            _elasticsearch?.Dispose();
+        }
 
-            public override async Task DisposeAsync()
-            {
-                await this.Container.DisposeAsync()
-                  .ConfigureAwait(false);
-            }
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask;
+        }
 
-            public override void Dispose()
-            {
-                this.configuration.Dispose();
-            }
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }

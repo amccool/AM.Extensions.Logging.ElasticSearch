@@ -11,6 +11,7 @@ using Nest;
 using Xunit.Abstractions;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using ElasticLogger.Test.Entities;
+using ElasticLogger.Test.Fixture;
 
 namespace ElasticLogger.Test
 {
