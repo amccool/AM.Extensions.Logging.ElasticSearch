@@ -78,7 +78,7 @@ namespace AM.Extensions.Logging.ElasticSearch
             var singleNode = new SingleNodeConnectionPool(_optionsMonitor.CurrentValue.ElasticsearchEndpoint);
 
             var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
-                .ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true)
+                .ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true)                      //notice we allowing invalid certs!!!!!   this should get a warning, and configuration
             .EnableHttpPipelining()
             .EnableHttpCompression()
             .ThrowExceptions();
