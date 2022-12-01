@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace ElasticLogger.Test
+namespace ElasticLogger.Test.Factory
 {
     class Startup
     {

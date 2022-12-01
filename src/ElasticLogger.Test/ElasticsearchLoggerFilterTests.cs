@@ -1,4 +1,4 @@
-﻿ using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using AM.Extensions.Logging.ElasticSearch;
@@ -10,18 +10,27 @@ using System.Threading.Tasks;
 using Nest;
 using Xunit.Abstractions;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using ElasticLogger.Test.Entities;
+using ElasticLogger.Test.Fixture;
 
 namespace ElasticLogger.Test
 {
-    public class ElasticsearchLoggerFilterTests : IClassFixture<ESFixture>
+    public class ElasticsearchLoggerFilterTests : IClassFixture<ElasticsearchFixture>
     {
         private readonly ITestOutputHelper _output;
-        private readonly ESFixture _fixture;
+        private readonly ElasticsearchFixture _fixture;
 
-        public ElasticsearchLoggerFilterTests(ESFixture fixture, ITestOutputHelper output)
+        public ElasticsearchLoggerFilterTests(ElasticsearchFixture fixture, ITestOutputHelper output)
         {
             _fixture = fixture;
             _output = output;
+        }
+
+        private ConnectionSettings connectionSettings(Uri endpoint)
+        {
+            var connSettings = new ConnectionSettings(endpoint);
+            connSettings.ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true);
+            return connSettings;
         }
 
         [Fact]
@@ -62,7 +71,7 @@ namespace ElasticLogger.Test
             logger.LogTrace("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -123,7 +132,7 @@ namespace ElasticLogger.Test
             logger.LogTrace("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -179,7 +188,7 @@ namespace ElasticLogger.Test
             logger.LogTrace("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -285,7 +294,7 @@ namespace ElasticLogger.Test
             logger.Log(logLevel, new EventId(), circularRefObj, null, (circle, exception) => "");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -335,7 +344,7 @@ namespace ElasticLogger.Test
             logger.Log(logLevel, new EventId(), circularRefObj, null, (circle, exception) => "");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -357,7 +366,7 @@ namespace ElasticLogger.Test
         public async Task Load_ES_with_explicit_type_write_and_search()
         {
             await _fixture.ReadyAsync();
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
 
             var tweet = new Tweet
@@ -418,7 +427,7 @@ namespace ElasticLogger.Test
             logger.LogTrace("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -470,7 +479,8 @@ namespace ElasticLogger.Test
             logger.LogError("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -486,6 +496,8 @@ namespace ElasticLogger.Test
 
             Assert.Single(dyndocs.Documents);
         }
+
+
 
         [Fact]
         public async Task Existing_ElasticSearch_Section_In_Config_Should_Be_Used_For_Log_Levels_Positive_Match()
@@ -523,7 +535,7 @@ namespace ElasticLogger.Test
             logger.LogTrace("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -576,7 +588,7 @@ namespace ElasticLogger.Test
             logger.LogCritical("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -630,7 +642,7 @@ namespace ElasticLogger.Test
             logger.LogInformation("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -684,7 +696,7 @@ namespace ElasticLogger.Test
             logger.LogInformation("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -738,7 +750,7 @@ namespace ElasticLogger.Test
             logger.LogCritical("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 
@@ -792,7 +804,7 @@ namespace ElasticLogger.Test
             logger.LogInformation("bananas taste yucky");
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(5));
-            var client = new ElasticClient(new ConnectionSettings(_fixture.Endpoint));
+            var client = new ElasticClient(connectionSettings(_fixture.Endpoint));
             await client.PingAsync();
             await delayTask;
 

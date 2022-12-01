@@ -1,17 +1,17 @@
+using AM.Extensions.Logging.ElasticSearch;
+using ElasticLogger.Test.Entities;
 using System.IO;
 using System.Threading.Tasks;
-using AM.Extensions.Logging.ElasticSearch;
-using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace ElasticLogger.Test
 {
-    public class MiscTests
+    public class SerializerTests
     {
         private readonly ITestOutputHelper _output;
 
-        public MiscTests(ITestOutputHelper outputHelper)
+        public SerializerTests(ITestOutputHelper outputHelper)
         {
             _output = outputHelper;
         }
@@ -31,16 +31,6 @@ namespace ElasticLogger.Test
             var reader = new StreamReader(stream);
 
             await reader.ReadToEndAsync();
-        }
-
-        [Fact(Skip ="issues with hosting")]
-        public async Task LoggingThing()
-        {
-            var factory = new CustomWebApplicationFactory<Startup>();
-
-            var client = factory.CreateClient();
-
-            await client.GetAsync("/");
         }
     }
 }
