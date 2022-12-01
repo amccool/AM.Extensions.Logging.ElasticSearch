@@ -28,7 +28,7 @@ namespace ElasticLogger.Test
 
         private ConnectionSettings connectionSettings(Uri endpoint)
         {
-            var connSettings = new ConnectionSettings(_fixture.Endpoint);
+            var connSettings = new ConnectionSettings(endpoint);
             connSettings.ServerCertificateValidationCallback((obj, cert, chain, policyerrors) => true);
             return connSettings;
         }

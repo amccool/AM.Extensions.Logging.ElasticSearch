@@ -20,7 +20,9 @@ namespace ElasticLogger.Test
         [Fact]
         public async Task LoggingThing()
         {
-            var factory = new CustomWebApplicationFactory<Startup>();
+            await _fixture.ReadyAsync();
+
+            var factory = new CustomWebApplicationFactory<Startup>(_fixture);
 
             var client = factory.CreateClient();
 
